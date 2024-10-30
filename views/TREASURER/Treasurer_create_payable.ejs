@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BSIT Fund Collection Management System - Create Payable</title>
+    <link rel="stylesheet" href="TREASURER_CSS/tresurer_create_payable.css">
+</head>
+<body>
+
+<header>
+    <div class="logo">
+        <img src="/BSIT_LOGO.png" alt="Logo">
+        <span class="BS">BSIT FUND COLLECTION<br><span class="IT"> MANAGEMENT SYSTEM</span></span>
+    </div>
+    <nav class="nav">
+        <a href="Treasurer_dashboard">DASHBOARD</a>
+        <a href="Treasurer_create_payable">PAYABLE</a>
+
+        <div class="dropdown">
+            <a href="#" class="dropbtn" onclick="toggleDropdown('remittanceDropdown')">RECEIVE</a>
+            <span class="arrow" onclick="toggleDropdown('remittanceDropdown')"></span>
+            <div class="dropdown-content" id="remittanceDropdown">
+                <a href="Treasurer_BSIT_3A_remittance">BSIT-3A</a>
+                <a href="Treasurer_BSIT_3B_remittance">BSIT-3B</a>
+            </div>
+        </div>
+
+        <div class="dropdown">
+            <a href="#" class="dropbtn" onclick="toggleDropdown('remittanceDropdown')">REMITTANCE</a>
+            <span class="arrow" onclick="toggleDropdown('remittanceDropdown')"></span>
+            <div class="dropdown-content" id="remittanceDropdown">
+                <a href="#">BSIT-3A</a>
+                <a href="#">BSIT-3B</a>
+            </div>
+        </div>
+        <div class="dropdown">
+            <a href="#" class="dropbtn" onclick="toggleDropdown('reportDropdown')">REPORT</a>
+            <span class="arrow" onclick="toggleDropdown('reportDropdown')"></span>
+            <div class="dropdown-content" id="reportDropdown">
+                <a href="#">MONTHLY REPORT</a>
+                <a href="#">EXPENSES</a>
+            </div>
+        </div>
+        <a href="Treasurer_register_user">REGISTER</a>
+        <img src="/user.jpg" alt="User Icon" class="user-icon">
+    </nav>
+</header>
+
+<% if (typeof message !== 'undefined') { %>
+    <div class="notification" id="notification">
+        <p><%= message %></p>
+    </div>
+<% } %>
+
+<div class="register-form-container">
+    <form method="post" action="create_payable" class="register-form">
+        <h2 class="register">Create Payable</h2>
+    
+        <select name="yearLevel" id="yearLevel" required>
+            <option value="" disabled selected>YEAR LEVEL</option>
+            <option value="3">3rd Year</option>
+        </select>
+    
+        <select name="block" id="block" required>
+            <option value="" disabled selected>BLOCK</option>
+            <option value="A">Block A</option>
+            <option value="B">Block B</option>
+        </select>
+        
+        <select name="student" id="student" required>
+            <option value="" disabled selected>NAME</option>
+            <option value="all">All Students</option> 
+        </select>
+    
+        <input name="description" type="text" placeholder="DESCRIPTION" required>
+        <input name="amount" type="number" placeholder="AMOUNT" required>
+        
+        <button type="submit">CREATE PAYABLE</button>
+    </form>
+</div>
+
+<script>
+    // Function to update student options based on selected yearLevel and block
+    function updateStudentOptions() {
+        const yearLevel = document.getElementById('yearLevel').value;
+        const block = document.getElementById('block').value;
+        const studentSelect = document.getElementById('student');
+
+        // Clear current student options
+        studentSelect.innerHTML = '<option value="" disabled selected>NAME</option><option value="all">All Students</option>';
+
+        if (yearLevel && block) {
+            // Fetch students based on yearLevel and block
+            fetch(`/get_students?yearLevel=${yearLevel}&block=${block}`)
+                .then(response => response.json())
+                .then(students => {
+                    students.forEach(student => {
+                        const option = document.createElement('option');
+                        option.value = student.userId; // Use userId as value
+                        option.textContent = `${student.firstName} ${student.lastName}`;
+                        studentSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error("Error fetching students:", error));
+        }
+    }
+
+    // Add event listeners to update student options when yearLevel or block changes
+    document.getElementById('yearLevel').addEventListener('change', updateStudentOptions);
+    document.getElementById('block').addEventListener('change', updateStudentOptions);
+</script>
+
+
+<script src="/TREASURER_JS/Treasurer_create_payable.js"></script>
+
+</body>
+</html>

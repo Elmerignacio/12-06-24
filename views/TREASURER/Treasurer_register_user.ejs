@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BSIT Fund Collection Management System</title>
+    <link rel="stylesheet" href="TREASURER_CSS/Treasurer_register_user.css">
+
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="/BSIT_LOGO.png" alt="Logo">
+            <span class="BS">BSIT FUND COLLECTION<br><span class="IT"> MANAGEMENT SYSTEM</span></span>
+        </div>
+        <nav class="nav">
+            <a href="Treasurer_dashboard">DASHBOARD</a>
+            <a href="Treasurer_create_payable">PAYABLE</a>
+
+            <div class="dropdown">
+                <a href="#" class="dropbtn" onclick="toggleDropdown('remittanceDropdown')">RECEIVE</a>
+                <span class="arrow" onclick="toggleDropdown('remittanceDropdown')"></span>
+                <div class="dropdown-content" id="remittanceDropdown">
+                    <a href="Treasurer_BSIT_3A_remittance">BSIT-3A</a>
+                    <a href="Treasurer_BSIT_3B_remittance">BSIT-3B</a>
+                </div>
+            </div>
+            
+        <div class="dropdown">
+            <a href="#" class="dropbtn" onclick="toggleDropdown('remittanceDropdown')">REMITTANCE</a>
+            <span class="arrow" onclick="toggleDropdown('remittanceDropdown')"></span>
+            <div class="dropdown-content" id="remittanceDropdown">
+                <a href="#">BSIT-3A</a>
+                <a href="#">BSIT-3B</a>
+            </div>
+        </div>
+        
+
+            </div>
+            <div class="dropdown">
+                <a href="#" class="dropbtn">REPORT</a>
+                <div class="dropdown-content" id="reportDropdown">
+                    <a href="#">MONTHLY REPORT</a>
+                    <a href="#">EXPENSES</a>
+                </div>
+            </div>
+            <a href="Treasurer_register_user">REGISTER</a>
+            <img src="/user.jpg" alt="User Icon" class="user-icon">
+        </nav>
+    </header>
+
+    <% if (typeof message !== 'undefined') { %>
+      <div class="notification" id="notification">
+          <p><%= message %></p>
+      </div>
+  <% } %>
+
+    <div class="register-form-container">
+        <form method="post" action="register_user_by_role" class="register-form">
+            <h2 class="register">Register</h2>
+
+            <input name="userId" type="integer" placeholder="ID NUMBER" required>
+            <input name="lastName" type="text" placeholder="LASTNAME" required>
+            <input name="firstName" type="text" placeholder="FIRSTNAME" required>
+
+            <div class="select-group">
+                <select name="yearLevel" required>
+                    <option value="" disabled selected>YEAR LEVEL</option>
+                    <option value="3">3rd Year</option>
+                </select>
+                <select name="block" required>
+                    <option value="" disabled selected>BLOCK</option>
+                    <option value="A">Block A</option>
+                    <option value="B">Block B</option>
+                </select>
+            </div>
+
+            <div class="gender">
+                <label>GENDER:</label>
+                <label><input type="radio" name="gender" value="male" required> MALE</label>
+                <label><input type="radio" name="gender" value="female" required> FEMALE</label>
+            </div>
+
+            <select name="role" id="role" required onchange="toggleAccess()">
+                <option value="" disabled selected>ROLE</option>
+                <option value="admin">Admin</option>
+                <option value="treasurer">Treasurer</option>
+                <option value="representative">Representative</option>
+                <option value="student">Student</option>
+            </select>
+
+            <input name="userName" type="text" id="username" placeholder="USERNAME" readonly required>
+            <input name="password" type="text" id="password" placeholder="PASSWORD" required>
+
+            <button type="submit">Register User</button>
+        </form>
+    </div>
+
+    <script src="/TREASURER_JS/Treasurer_register_user.js" ></script>
+</body>
+</html>

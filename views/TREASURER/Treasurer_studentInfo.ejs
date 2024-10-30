@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/TREASURER_CSS/Treasurer_studentInfo.css">
+</head>
+<body>
+
+     <header>
+    <div class="logo">
+        <img src="/BSIT_LOGO.png" alt="Logo">
+        <span class="BS">BSIT FUND COLLECTION<br><span class="IT"> MANAGEMENT SYSTEM</span></span>
+    </div>
+    <nav class="nav">
+        <a href="Treasurer_dashboard">DASHBOARD</a>
+
+        <a href="Treasurer_create_payable">PAYABLE</a>
+
+        <div class="dropdown">
+            <a href="#" class="dropbtn" onclick="toggleDropdown('remittanceDropdown')">RECEIVE</a>
+            <span class="arrow" onclick="toggleDropdown('remittanceDropdown')"></span>
+            <div class="dropdown-content" id="remittanceDropdown">
+                <a href="Treasurer_BSIT_3A_remittance">BSIT-3A</a>
+                <a href="Treasurer_BSIT_3B_remittance">BSIT-3B</a>
+            </div>
+        </div>
+        
+        <div class="dropdown">
+            <a href="#" class="dropbtn" onclick="toggleDropdown('remittanceDropdown')">REMITTANCE</a>
+            <span class="arrow" onclick="toggleDropdown('remittanceDropdown')"></span>
+            <div class="dropdown-content" id="remittanceDropdown">
+                <a href="#">BSIT-3A</a>
+                <a href="#">BSIT-3B</a>
+            </div>
+        </div>
+        
+          
+
+        </div>
+        <div class="dropdown">
+            <a href="#" class="dropbtn" onclick="toggleDropdown('reportDropdown')">REPORT</a>
+            <span class="arrow" onclick="toggleDropdown('reportDropdown')"></span>
+            <div class="dropdown-content" id="reportDropdown">
+                <a href="#">MONTHLY REPORT</a>
+                <a href="#">EXPENSES</a>
+            </div>
+        </div>
+        <a href="Treasurer_register_user">REGISTER</a>
+        <img src="/user.jpg" alt="User Icon" class="user-icon">
+    </nav>
+</header>
+
+<div class="container">
+    <div class="info">
+        <h2>2112102 ✏️ 📁</h2>
+        <p>VILLAREAL, QUEEN MARY</p>
+        <p>FEMALE</p>
+        <p>BSIT-3A</p>
+    </div>
+    <div class="scrollable-table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>DATE</th>
+                    <th>PAYABLE</th>
+                    <th>PAID</th>
+                    <th>BALANCE</th>
+                </tr>
+            </thead>
+            <tbody>
+    
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="2">TOTAL</td>
+                    <td>₱450.00</td>
+                    <td>₱20.00</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <button class="receive-btn no-underline">RECEIVE</button>
+</div>
+
+</body>
+</html>
