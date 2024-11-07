@@ -6,7 +6,6 @@
     <title>Treasurer Remittance</title>
     <link rel="stylesheet" href="/TREASURER_CSS/Treasurer_remmitance.css">        
 </head>
-
 <body>
     <header>
         <div class="logo">
@@ -54,68 +53,27 @@
         <% representativeNames.forEach(name => { %>
             <p><strong>Representative:</strong> <%= name %></p>
         <% }); %>
-        
+
         <div class="scrollable-table-container">
             <table>
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Payable</th>
+                        <th>Student Name</th>
+                        <th>Payment</th>
                         <th>Amount Paid</th>
-                        <th>Balance</th>
+                        <th>Remitted By</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <% let totalAmountPaid = 0; %>
-                    <% let totalBalance = 0; %>
-                    <% filteredUsers.forEach(user => { %>
-                        <% 
-                            const userPayables = payables.filter(p => p.student === `${user.firstName} ${user.lastName}`);
-                            let userTotalPaid = 0;
-                            let userTotalBalance = 0;
-                            let payableDescriptions = userPayables.map(p => p.description).join(', ');
-                            
-                            if (userPayables.length > 0) {
-                                userPayables.forEach(payable => {
-                                    userTotalPaid += payable.amountPaid || 0;
-                                    userTotalBalance += (payable.amount || 0) - (payable.amountPaid || 0);
-                                });
-                            }
-                        %>
+                    <% payables.forEach(payable => { %>
                         <tr>
-                            <td>
-                                <a href="/Display_Student_Info/<%= user.userId %>" class="no-underline">
-                                    <%= user.firstName %> <%= user.lastName %>
-                                </a>
-                            </td>
-                            <td>
-                                <% if (userPayables.length > 0) { %>
-                                    <%= payableDescriptions %>
-                                <% } else { %>
-                                    No payable information available
-                                <% } %>
-                            </td>
-                            <td>
-                                <%= userTotalPaid %>
-                            </td>
-                            <td>
-                                <%= userTotalBalance %>
-                            </td>
+                            <td><%= payable.student %></td>
+                            <td><%= payable.payableDescription %></td>
+                            <td><%= payable.amountPaid %></td>
+                            <td><%= payable.remittedBy %></td>
                         </tr>
-                        <% 
-                            totalAmountPaid += userTotalPaid;
-                            totalBalance += userTotalBalance;
-                        %>
                     <% }); %>
                 </tbody>
-                <tfoot>
-                    <tr>
-                        <td>Total</td>
-                        <td></td>
-                        <td><%= totalAmountPaid %></td>
-                        <td><%= totalBalance %></td>
-                    </tr>
-                </tfoot>
             </table>
         </div>
     </div>

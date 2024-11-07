@@ -7,6 +7,16 @@
     <link rel="stylesheet" href="TREASURER_CSS/Treasurer_register_user.css">
 
 </head>
+<style>
+    .notification {
+        background-color: #f44336; /* Red */
+        color: white;
+        padding: 15px;
+        margin: 19px;
+        border-radius: 5px;
+        text-align: center;
+    }
+</style>
 <body>
     <header>
         <div class="logo">
@@ -50,11 +60,13 @@
     </header>
 
     <% if (typeof message !== 'undefined') { %>
-      <div class="notification" id="notification">
-          <p><%= message %></p>
-      </div>
-  <% } %>
+        <div class="notification" id="notification">
+            <p><%= message %></p>
+        </div>
+    <% } %>
+    
 
+ 
     <div class="register-form-container">
         <form method="post" action="register_user_by_role" class="register-form">
             <h2 class="register">Register</h2>

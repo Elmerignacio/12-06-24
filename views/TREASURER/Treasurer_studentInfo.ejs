@@ -3,86 +3,224 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Student Information</title>
     <link rel="stylesheet" href="/TREASURER_CSS/Treasurer_studentInfo.css">
+    <style>
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield; 
+        }
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+            display: none; /* Hidden by default */
+        }
+
+
+    .notification {
+        background-color: #f44336; /* Red */
+        color: white;
+        padding: 15px;
+        margin: 19px;
+        border-radius: 5px;
+        text-align: center;
+    }
+
+    </style>
 </head>
 <body>
 
-     <header>
+<header>
     <div class="logo">
         <img src="/BSIT_LOGO.png" alt="Logo">
         <span class="BS">BSIT FUND COLLECTION<br><span class="IT"> MANAGEMENT SYSTEM</span></span>
     </div>
     <nav class="nav">
-        <a href="Treasurer_dashboard">DASHBOARD</a>
-
-        <a href="Treasurer_create_payable">PAYABLE</a>
-
+        <a href="/Treasurer_dashboard">DASHBOARD</a>
+        <a href="/Treasurer_create_payable">PAYABLE</a>
         <div class="dropdown">
-            <a href="#" class="dropbtn" onclick="toggleDropdown('remittanceDropdown')">RECEIVE</a>
-            <span class="arrow" onclick="toggleDropdown('remittanceDropdown')"></span>
-            <div class="dropdown-content" id="remittanceDropdown">
-                <a href="Treasurer_BSIT_3A_remittance">BSIT-3A</a>
-                <a href="Treasurer_BSIT_3B_remittance">BSIT-3B</a>
+            <a href="javascript:void(0)" class="dropbtn" onclick="toggleDropdown('remittanceDropdown')">RECEIVE</a>
+            <div class="dropdown-content" id="remittanceDropdown" style="display: none;">
+                <a href="/Treasurer_BSIT_3A_remittance">BSIT-3A</a>
+                <a href="/Treasurer_BSIT_3B_remittance">BSIT-3B</a>
             </div>
         </div>
-        
-        <div class="dropdown">
-            <a href="#" class="dropbtn" onclick="toggleDropdown('remittanceDropdown')">REMITTANCE</a>
-            <span class="arrow" onclick="toggleDropdown('remittanceDropdown')"></span>
-            <div class="dropdown-content" id="remittanceDropdown">
-                <a href="#">BSIT-3A</a>
-                <a href="#">BSIT-3B</a>
-            </div>
-        </div>
-        
-          
-
-        </div>
-        <div class="dropdown">
-            <a href="#" class="dropbtn" onclick="toggleDropdown('reportDropdown')">REPORT</a>
-            <span class="arrow" onclick="toggleDropdown('reportDropdown')"></span>
-            <div class="dropdown-content" id="reportDropdown">
-                <a href="#">MONTHLY REPORT</a>
-                <a href="#">EXPENSES</a>
-            </div>
-        </div>
-        <a href="Treasurer_register_user">REGISTER</a>
+        <a href="/Treasurer_register_user">REGISTER</a>
         <img src="/user.jpg" alt="User Icon" class="user-icon">
     </nav>
 </header>
 
+<% if (typeof message !== 'undefined') { %>
+    <div class="notification" id="notification">
+        <p><%= message %></p>
+    </div>
+<% } %>
+
+
+
+
 <div class="container">
     <div class="info">
-        <h2>2112102 ✏️ 📁</h2>
-        <p>VILLAREAL, QUEEN MARY</p>
-        <p>FEMALE</p>
-        <p>BSIT-3A</p>
+        <h2><%= student.userId %> </h2>
+        <p><%= student.firstName %> <%= student.lastName %></p>
+        <p><%= student.gender %></p>
+        <p>BSIT -<%= student.yearLevel %><%= student.block %></p>
     </div>
-    <div class="scrollable-table-container">
-        <table>
-            <thead>
-                <tr>
-                    <th>DATE</th>
-                    <th>PAYABLE</th>
-                    <th>PAID</th>
-                    <th>BALANCE</th>
-                </tr>
-            </thead>
-            <tbody>
-    
-            </tbody>
-            <tfoot>
-                <tr>
-                    <td colspan="2">TOTAL</td>
-                    <td>₱450.00</td>
-                    <td>₱20.00</td>
-                </tr>
-            </tfoot>
-        </table>
-    </div>
-    <button class="receive-btn no-underline">RECEIVE</button>
-</div>
 
+    <form id="remittance-form" action="/api/remittances" method="POST" onsubmit="return validateForm()">
+        <input type="hidden" name="studentId" value="<%= student.userId %>">
+        <div class="scrollable-table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 200px;">DATE</th>
+                        <th>PAYABLE</th>
+                        <th>PAID</th>
+                        <th>BALANCE</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% payables.forEach(payable => { %>
+                        <tr>
+                            <td class="paid-date" style="width: 100px;">
+                                <% 
+                                    const remittance = remittances.find(rem => rem.payable === payable.description); 
+                                %>
+                                <%= remittance ? remittance.date : '' %>
+                            </td>
+                            <td><%= payable.description %></td>
+                            <td>
+                                <input type="number" 
+                                    name="paidAmounts[<%= payable.id %>]" 
+                                    value="<%= payable.amountPaid !== undefined ? payable.amountPaid : (remittances.find(rem => rem.payable === payable.description)?.paid || 0) %>" 
+                                    data-amount="<%= payable.amount %>" 
+                                    class="paid-input" 
+                                    style="width: 100%; border: none; outline: none;"
+                                    onchange="updateTotals()">
+                            </td>
+                            <td class="balance"><%= Math.floor(payable.amount - (payable.amountPaid || 0)) %></td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="1">TOTAL</td>
+                        <td></td>
+                        <td class="total-paid">
+                            <%= Math.floor(payables.reduce((total, payable) => total + (payable.amountPaid || 0), 0)) %>
+                        </td>
+                        <td class="total-balance">
+                            <%= Math.floor(payables.reduce((total, payable) => total + (payable.amount - (payable.amountPaid || 0)), 0)) %>
+                        </td>
+                    </tr>       
+                </tfoot>
+            </table>
+            
+        </div>
+        <input type="hidden" name="date" id="remittance-date">
+        <button type="submit" class="Submit" id="receive-button">RECEIVE</button>
+    </form>
+
+
+
+    <script>
+        function toggleDropdown(dropdownId) {
+            const dropdowns = document.getElementsByClassName("dropdown-content");
+            for (let i = 0; i < dropdowns.length; i++) {
+                if (dropdowns[i].id !== dropdownId) {
+                    dropdowns[i].classList.remove('show');
+                }
+            }
+            const dropdown = document.getElementById(dropdownId);
+            dropdown.classList.toggle('show');
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.matches('.dropbtn') && !event.target.matches('.arrow')) {
+                const dropdowns = document.getElementsByClassName("dropdown-content");
+                for (let i = 0; i < dropdowns.length; i++) {
+                    const openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        }
+
+        function updateTotals() {
+            const totalPaidCells = document.querySelectorAll('.total-paid');
+            const totalBalanceCells = document.querySelectorAll('.total-balance');
+            let totalPaid = 0;
+            let totalBalance = 0;
+            let hasNegativeBalance = false;
+
+            document.querySelectorAll('.paid-input').forEach(input => {
+                const paidAmount = parseFloat(input.value) || 0;
+                const payableAmount = parseFloat(input.dataset.amount);
+                const balance = payableAmount - paidAmount;
+
+                const row = input.closest('tr');
+                const balanceCell = row.querySelector('.balance');
+                balanceCell.textContent = Math.floor(balance);
+
+                totalPaid += paidAmount;
+                totalBalance += balance;
+
+                // Check if any balance is negative
+                if (balance < 0) {
+                    hasNegativeBalance = true;
+                }
+
+                // Update the date only for the current row if paid amount is greater than 0
+                if (paidAmount > 0) {
+                    const today = new Date();
+                    const dateStr = today.toISOString().split('T')[0]; // YYYY-MM-DD format
+                    document.getElementById('remittance-date').value = dateStr;
+
+                    const paidDateCell = row.querySelector('.paid-date');
+                    paidDateCell.textContent = dateStr;
+                }
+            });
+
+            totalPaidCells.forEach(cell => cell.textContent = Math.floor(totalPaid));
+            totalBalanceCells.forEach(cell => cell.textContent = Math.floor(totalBalance));
+
+            toggleReceiveButton(totalPaid); 
+
+            // Display error message if there is a negative balance
+            const errorMessage = document.getElementById('error-message');
+            if (hasNegativeBalance) {
+                errorMessage.textContent = "One or more payments exceed the balance. Negative balances are not allowed.";
+                errorMessage.style.display = "block";  // Show the error message
+            } else {
+                errorMessage.style.display = "none"; // Hide the error message
+            }
+        }
+
+        function toggleReceiveButton(totalPaid) {
+            const receiveButton = document.getElementById('receive-button');
+            receiveButton.disabled = totalPaid <= 0; 
+        }
+
+        function setCurrentDate() {
+            const today = new Date();
+            const dateStr = today.toISOString().split('T')[0]; // YYYY-MM-DD format
+            document.getElementById('remittance-date').value = dateStr;
+        }
+
+        // Set the current date on page load
+        window.onload = setCurrentDate;
+
+        document.querySelectorAll('.paid-input').forEach(input => {
+            input.addEventListener('change', () => {
+                updateTotals();
+            });
+        });
+    </script>
 </body>
 </html>

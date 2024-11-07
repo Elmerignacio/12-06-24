@@ -18,14 +18,12 @@ route.get('/Treasurer_register_user', admin_controller.Treasurer_register_user)
 route.get('/Treasurer_BSIT_3A_remittance',admin_controller.Display_BSIT_3A)
 route.get('/Treasurer_BSIT_3B_remittance',admin_controller.Display_BSIT_3B)
 
+route.get('/students',admin_controller.student)
+route.post('/create_payable',admin_controller.create_payable)
 
+route.get('/Display_Student_Info/:userId', admin_controller.Display_Student_Info)
 
-route.get('/Treasurer_studentInfo',admin_controller.Treasurer_studentInfo)
-
-route.get('/student',admin_controller.student)
-
-
-
+route.post('/api/remittances', admin_controller.save_remittance)
 
 
 module.exports = route

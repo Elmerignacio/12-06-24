@@ -80,37 +80,6 @@
     </form>
 </div>
 
-<script>
-    // Function to update student options based on selected yearLevel and block
-    function updateStudentOptions() {
-        const yearLevel = document.getElementById('yearLevel').value;
-        const block = document.getElementById('block').value;
-        const studentSelect = document.getElementById('student');
-
-        // Clear current student options
-        studentSelect.innerHTML = '<option value="" disabled selected>NAME</option><option value="all">All Students</option>';
-
-        if (yearLevel && block) {
-            // Fetch students based on yearLevel and block
-            fetch(`/get_students?yearLevel=${yearLevel}&block=${block}`)
-                .then(response => response.json())
-                .then(students => {
-                    students.forEach(student => {
-                        const option = document.createElement('option');
-                        option.value = student.userId; // Use userId as value
-                        option.textContent = `${student.firstName} ${student.lastName}`;
-                        studentSelect.appendChild(option);
-                    });
-                })
-                .catch(error => console.error("Error fetching students:", error));
-        }
-    }
-
-    // Add event listeners to update student options when yearLevel or block changes
-    document.getElementById('yearLevel').addEventListener('change', updateStudentOptions);
-    document.getElementById('block').addEventListener('change', updateStudentOptions);
-</script>
-
 
 <script src="/TREASURER_JS/Treasurer_create_payable.js"></script>
 
