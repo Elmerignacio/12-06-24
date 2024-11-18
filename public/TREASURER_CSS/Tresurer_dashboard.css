@@ -48,6 +48,11 @@ header {
   padding: 10px 15px;
   transition: background-color 0.3s; 
 }
+.nav a:active {
+  background-color: #d1e7dd;
+  border-radius: 5px;
+  color: darkgreen; 
+}
 
 .nav a:hover {
   background-color: #d1e7dd; 

@@ -20,7 +20,8 @@ module.exports = (sequelize, DataTypes) => {
     date: DataTypes.DATEONLY,
     payable: DataTypes.STRING,
     paid: DataTypes.INTEGER,
-    balance: DataTypes.INTEGER
+    balance: DataTypes.INTEGER,
+    status: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'remittance',

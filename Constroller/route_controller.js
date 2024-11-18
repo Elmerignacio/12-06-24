@@ -1,7 +1,46 @@
 const model = require('../models');
+const bcrypt = require('bcrypt'); 
+const { Op } = require('sequelize');
+const jwt = require('jsonwebtoken')
+require ("dotenv").config()
 
 const login = (req, res) => {
-    res.render('login');
+    res.render('login'); 
+
+};
+const login_post = async (req, res) => {
+    const {username, password} = req.body;
+
+    try {
+        const user = await model.register_user.findOne({where: {userName:username}});
+        if (!user) return res.status(400).redirect ("login")
+
+        const passwordMatch = await bcrypt.compare(password, user.password);
+        if (!passwordMatch)return res.status(400).redirect ("login")
+
+        const outTokenValue = jwt.sign({
+            exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24),
+            role: user.role,
+            userid:user.id,
+            firstname: user.firstName,
+            lastname: user.lastName,
+             }, process.env.JWT_SECRET,)
+
+             res.cookie("funds", outTokenValue,{
+                httpOnly:true,
+                secure:true,
+                sameSite:"strict",
+                maxAge:1000*60*60*24    
+
+             });
+
+             return res.redirect("Treasurer_dashboard")
+                
+    } catch (error) {
+        console.log(error);
+        
+    }
+ 
 };
 
 const Admin_dashboard = (req, res) => {
@@ -11,18 +50,17 @@ const Admin_dashboard = (req, res) => {
 const Admin_register_user = (req, res) => {
     res.render('Admin_register_user');
 };
-
 const register_user_by_role = (req, res) => {
     const register_post_db = {
         userId: req.body.userId,
-        lastName: req.body.lastName,
-        firstName: req.body.firstName,
-        yearLevel: req.body.yearLevel,
+        lastName: req.body.lastName.toUpperCase(),
+        firstName: req.body.firstName.toUpperCase(),
+        yearLevel: req.body.yearLevel.toUpperCase(),
         block: req.body.block,
-        gender: req.body.gender,
-        role: req.body.role,
+        gender: req.body.gender.toUpperCase(),
+        role: req.body.role.toUpperCase(),
         userName: req.body.userName,
-        password: req.body.password,
+        password: req.body.password,  
     };
 
     const handleError = (message, status = 500) => {
@@ -97,7 +135,23 @@ const register_user_by_role = (req, res) => {
 };
 
 const createUser = (register_post_db, res) => {
-    return model.register_user.create(register_post_db)
+    if (register_post_db.role !== "STUDENT") {
+        bcrypt.hash(register_post_db.password, 10, (err, hashedPassword) => {
+            if (err) {
+                console.error("Error hashing password:", err);
+                return res.status(500).render("Treasurer_register_user", { message: "Something went wrong while hashing the password!" });
+            }
+            register_post_db.password = hashedPassword;
+
+            saveUser(register_post_db, res);
+        });
+    } else {
+        saveUser(register_post_db, res);
+    }
+};
+
+const saveUser = (register_post_db, res) => {
+    model.register_user.create(register_post_db)
         .then(() => {
             res.status(200).render("Treasurer_register_user", { message: "Registration successful!" });
         })
@@ -107,76 +161,83 @@ const createUser = (register_post_db, res) => {
         });
 };
 
+
 const Treasurer_dashboard = (req, res) => {
     res.render('Treasurer_dashboard');
 };
+
 
 const Treasurer_create_payable = (req, res) => {
     res.render('Treasurer_create_payable');
 };
 
+
 const Treasurer_register_user = (req, res) => {
     res.render('Treasurer_register_user');
 };
 
-    const Display_BSIT_3A = (req, res) => {
-        Promise.all([
-            model.register_user.findAll(),
-            model.payable.findAll()
-        ])
-        .then(([users, payables]) => {
-            const filteredUsers = users.filter(user =>
-                ['student', 'representative'].includes(user.role) &&
-                user.yearLevel === '3' &&
-                user.block === 'A'
-            );
+const Display_BSIT_3A = (req, res) => {
+    Promise.all([
+        model.register_user.findAll(),
+        model.payable.findAll(),
+        model.remittance.findAll() 
+    ])
+    .then(([users, payables, remittances]) => {  
+        const filteredUsers = users.filter(user =>
+            ['STUDENT', 'REPRESENTATIVE'].includes(user.role) &&
+            user.yearLevel === '3' &&
+            user.block === 'A'
+        );
 
-            const representativeNames = filteredUsers
-                .filter(user => user.role === 'representative')
-                .map(representative => `${representative.firstName} ${representative.lastName}`);
+        const representativeNames = filteredUsers
+            .filter(user => user.role === 'REPRESENTATIVE')
+            .map(representative => `${representative.firstName} ${representative.lastName}`);
 
-            res.render("Treasurer_BSIT_3A_remittance", {
-                blockKey: 'BSIT - 3A',
-                representativeNames,
-                filteredUsers,
-                payables
-            });
-        })
-        .catch(error => {
-            console.error(error);
-            res.status(500).render("error", { message: "Unable to retrieve data" });
+        res.render("Treasurer_BSIT_3A_remittance", {
+            blockKey: 'BSIT - 3A',
+            representativeNames,
+            filteredUsers,
+            payables,
+            remittances 
         });
-    };
+    })
+    .catch(error => {
+        console.error(error);
+        res.status(500).render("error", { message: "Unable to retrieve data" });
+    });
+};
 
-    const Display_BSIT_3B = (req, res) => {
-        Promise.all([
-            model.register_user.findAll(),
-            model.payable.findAll()
-        ])
-        .then(([users, payables]) => {
-            const filteredUsers = users.filter(user =>
-                ['student', 'representative'].includes(user.role) &&
-                user.yearLevel === '3' &&
-                user.block === 'B'
-            );
 
-            const representativeNames = filteredUsers
-                .filter(user => user.role === 'representative')
-                .map(representative => `${representative.firstName} ${representative.lastName}`);
+const Display_BSIT_3B = (req, res) => {
+    Promise.all([
+        model.register_user.findAll(),
+        model.payable.findAll(),
+        model.remittance.findAll() 
+    ])
+    .then(([users, payables, remittances]) => {  
+        const filteredUsers = users.filter(user =>
+            ['STUDENT', 'REPRESENTATIVE'].includes(user.role) &&
+            user.yearLevel === '3' &&
+            user.block === 'B'
+        );
 
-            res.render("Treasurer_BSIT_3A_remittance", {
-                blockKey: 'BSIT - 3B',
-                representativeNames,
-                filteredUsers,
-                payables
-            });
-        })
-        .catch(error => {
-            console.error(error);
-            res.status(500).render("error", { message: "Unable to retrieve data" });
+        const representativeNames = filteredUsers
+            .filter(user => user.role === 'REPRESENTATIVE')
+            .map(representative => `${representative.firstName} ${representative.lastName}`);
+
+        res.render("Treasurer_BSIT_3A_remittance", {
+            blockKey: 'BSIT - 3A',
+            representativeNames,
+            filteredUsers,
+            payables,
+            remittances 
         });
-    };
-
+    })
+    .catch(error => {
+        console.error(error);
+        res.status(500).render("error", { message: "Unable to retrieve data" });
+    });
+};
 
 const student = (req, res) => {
     const { yearLevel, block } = req.query;
@@ -195,8 +256,8 @@ const student = (req, res) => {
         console.error(error);
         res.status(500).json({ error: 'Unable to fetch students.' });
     });
-};
-
+}; 
+ 
 const create_payable = (req, res) => {
     const { yearLevel, block, student, description, amount } = req.body;
 
@@ -207,8 +268,14 @@ const create_payable = (req, res) => {
     };
 
     if (student !== "all") {
-        const [firstName, lastName] = student.split(' ');
-        searchCondition = { ...searchCondition, firstName, lastName };
+        const nameParts = student.trim().split(' ');
+        searchCondition = {
+            ...searchCondition,
+            [Op.or]: [
+                { firstName: { [Op.in]: nameParts } },
+                { lastName: { [Op.in]: nameParts } }
+            ]
+        };
     }
 
     model.register_user.findAll({ where: searchCondition })
@@ -236,6 +303,8 @@ const create_payable = (req, res) => {
         });
 };
 
+
+
 const Display_Student_Info = (req, res) => {
     const userId = req.params.userId;
 
@@ -248,10 +317,11 @@ const Display_Student_Info = (req, res) => {
                 .then(payables => {
                     return model.remittance.findAll({ where: { student: `${student.firstName} ${student.lastName}` } })
                         .then(remittances => {
+
                             const payablesWithBalance = payables.map(payable => {
                                 const matchedRemittance = remittances.find(rem => rem.payable === payable.description);
                                 const amountPaid = matchedRemittance ? matchedRemittance.paid : 0;
-                                const balance = payable.amount - amountPaid;
+                                const balance = payable.amount;
 
                                 return {
                                     ...payable.toJSON(),
@@ -260,7 +330,14 @@ const Display_Student_Info = (req, res) => {
                                 };
                             });
 
-                            res.render("Treasurer_studentInfo", { student, payables: payablesWithBalance, remittances });
+                            const currentDate = new Date().toLocaleDateString(); 
+
+                            res.render("Treasurer_studentInfo", { 
+                                student, 
+                                payables: payablesWithBalance, 
+                                remittances,
+                                currentDate 
+                            });
                         });
                 });
         })
@@ -269,83 +346,243 @@ const Display_Student_Info = (req, res) => {
             res.status(500).render("error", { message: "Unable to retrieve student information." });
         });
 };
-// Save remittance
-const save_remittance = (req, res) => {
-    const { date, paidAmounts, studentId } = req.body;
-    const remittancePromises = [];
-    let hasValidPayments = false;
-    let hasNegativeBalance = false;
 
-    console.log("Incoming date:", date); // Log incoming date for debugging
 
-    // Ensure the date is in "YYYY-MM-DD" format
-    const dateParts = date.split('-'); // Assuming date is in "YYYY-MM-DD"
-    if (dateParts.length !== 3) {
-        return res.status(400).render("error", { message: "Invalid date format. Please use YYYY-MM-DD." });
-    }
 
-    const [year, month, day] = dateParts;
+function getCurrentLocalDate() {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset()); 
+    return now.toISOString().split('T')[0]; 
+}
 
-    // Ensure month and day are two digits
-    const formattedMonth = month.padStart(2, '0');
-    const formattedDay = day.padStart(2, '0');
+const save_remittance = async (req, res) => {
+    const { studentName, studentBlock, studentYearLevel, studentId } = req.body;
 
-    const saveDate = `${year}-${formattedMonth}-${formattedDay}`; // Construct the date in the correct format
-    console.log("Date to be saved:", saveDate); // Check the output
+    const remittances = [];
 
-    for (const payableId in paidAmounts) {
-        const amountPaid = parseFloat(paidAmounts[payableId]);
+    for (const [key, value] of Object.entries(req.body)) {
+        if (key.startsWith('Description_')) {
+            const payableId = key.split('_')[1];
+            const description = req.body[`Description_${payableId}`];
+            const paidAmount = req.body[`paidAmount_${payableId}`];
+            const balances = req.body[`balance${payableId}`];
 
-        if (amountPaid > 0) {
-            hasValidPayments = true;
-            remittancePromises.push(
-                model.payable.findByPk(payableId).then((payable) => {
-                    if (!payable) {
-                        console.error(`Payable with ID ${payableId} not found`);
-                        return Promise.resolve();
+            if (paidAmount && paidAmount > 0) {
+                const existingRemittance = await model.remittance.findOne({
+                    where: {
+                        student: studentName,
+                        payable: description,
+                        date: getCurrentLocalDate()
                     }
+                });
 
-                    const balance = payable.amount - amountPaid;
-
-                    if (balance < 0) {
-                        hasNegativeBalance = true;
-                    }
-
-                    const remittance = {
-                        payable: payable.description,
-                        date: saveDate,  
-                        paid: amountPaid,
-                        balance,
-                        description: payable.description,
-                        yearLevel: payable.yearLevel,
-                        block: payable.block,
-                        student: payable.student
-                    };
-
-                    return model.remittance.create(remittance).catch((error) => {
-                        console.error('Error saving remittance:', error.message);
+                if (!existingRemittance) {
+                    remittances.push({
+                        student: studentName,
+                        block: studentBlock,
+                        yearLevel: studentYearLevel,
+                        payable: description,
+                        paid: paidAmount,
+                        balance: balances - paidAmount,
+                        date: getCurrentLocalDate(),
+                        status: 'pending' 
                     });
-                })
-            );
+
+                    const payable = await model.payable.findOne({
+                        where: {
+                            student: studentName,
+                            description: description
+                        }
+                    });
+
+                    if (payable) {
+                        const newBalance = payable.amount - paidAmount;
+
+                        await model.payable.update(
+                            { amount: newBalance },
+                            {
+                                where: {
+                                    student: studentName,
+                                    description: description
+                                }
+                            }
+                        );
+                    }
+                }
+            }
         }
     }
 
-    Promise.all(remittancePromises)
-        .then(() => {
-            if (hasValidPayments && !hasNegativeBalance) {
-                res.redirect(`/Display_Student_Info/${studentId}`);
-            } else {
-                res.status(400).render("error", { message: hasNegativeBalance ? "One or more payments exceed the balance." : "No valid payments to save." });
+    if (remittances.length > 0) {
+        try {
+            const results = await Promise.all(
+                remittances.map(remittance => model.remittance.create(remittance))
+            );
+            res.redirect(`/Display_Student_Info/${studentId}`);
+        } catch (error) {
+            console.error("Error saving remittance:", error);
+            res.status(500).send("Failed to save remittances.");
+        }
+    } else {
+        res.status(400).send("No valid payable amounts provided.");
+    }
+};
+
+const treasurer_3A_verify_remittance = (req, res) => {
+    const selectedDate = req.query.date || ''; 
+
+    Promise.all([ 
+        model.register_user.findAll(), 
+        model.remittance.findAll() 
+    ])
+    .then(([users, remittances]) => {  
+        const filteredStudents = users.filter(user =>
+            user.role === 'STUDENT' &&
+            user.yearLevel === '3' &&
+            user.block === 'A' 
+        );
+
+        const representatives = users.filter(user => user.role === 'REPRESENTATIVE');
+        
+        console.log("Representatives:", representatives); 
+        
+        const studentRemittances = remittances.map(remittance => {
+            const student = users.find(user => user.firstName + ' ' + user.lastName === remittance.student);
+            
+            if (student && student.block === 'A') {
+                const representative = representatives.find(rep => rep.block === student.block && rep.yearLevel === student.yearLevel);
+                
+                return {
+                    studentName: remittance.student,
+                    payment: remittance.payable,
+                    amountPaid: remittance.paid,
+                    date: remittance.date,
+                    block: student.block,
+                    representativeName: representative ? `${representative.firstName} ${representative.lastName}` : 'N/A',
+                    status: remittance.status  
+                };
             }
-        })
-        .catch((error) => {
-            console.error('Error processing remittance:', error);
-            res.status(500).render("error", { message: "Unable to save remittance." });
+        }).filter(remittance => remittance);  
+
+        console.log("Student Remittances:", studentRemittances); 
+
+        const representativeNames = representatives
+            .filter(rep => rep.block === 'A')  
+            .map(representative => `${representative.firstName} ${representative.lastName}`);
+
+        res.render("Treasurer_verify_remittance", {
+            blockKey: 'BSIT - 3A',
+            studentRemittances,
+            representativeNames,
+            filteredStudents,
+            selectedDate, 
         });
+    })
+    .catch(error => {
+        console.error(error);
+        res.status(500).render("error", { message: "Unable to retrieve data" });
+    });
+};
+
+const treasurer_3B_verify_remittance = (req, res) => {
+    Promise.all([ 
+        model.register_user.findAll(), 
+        model.remittance.findAll() 
+    ])
+    .then(([users, remittances]) => {  
+        const filteredStudents = users.filter(user =>
+            user.role === 'STUDENT' &&
+            user.yearLevel === '3' &&
+            user.block === 'B' 
+        );
+
+        const representatives = users.filter(user => user.role === 'REPRESENTATIVE');
+        
+        console.log("Representatives:", representatives); 
+        
+        const studentRemittances = remittances.map(remittance => {
+            const student = users.find(user => user.firstName + ' ' + user.lastName === remittance.student);
+            
+            if (student && student.block === 'B') {
+                const representative = representatives.find(rep => rep.block === student.block && rep.yearLevel === student.yearLevel);
+                
+                return {
+                    studentName: remittance.student,
+                    payment: remittance.payable,
+                    amountPaid: remittance.paid,
+                    date: remittance.date,
+                    block: student.block,
+                    representativeName: representative ? `${representative.firstName} ${representative.lastName}` : 'N/A',
+                    status: remittance.status  
+                };
+            }
+        }).filter(remittance => remittance);  
+
+        console.log("Student Remittances:", studentRemittances); 
+
+        const representativeNames = representatives
+            .filter(rep => rep.block === 'B')  
+            .map(representative => `${representative.firstName} ${representative.lastName}`);
+
+        res.render("Treasurer_verify_remittance", {
+            blockKey: 'BSIT - 3B',
+            studentRemittances,
+            representativeNames,
+            filteredStudents,
+        });
+    })
+    .catch(error => {
+        console.error(error);
+        res.status(500).render("error", { message: "Unable to retrieve data" });
+    });
 };
 
 
+const Treasurer_save_fund = (req, res)=> {
+    
 
+    const { yearlevel, block, amount, date } = req.body;
+ 
+}
+
+const updateStudent = async (req, res) => {
+    const { studentId, firstName, lastName, gender, yearLevel, block, payable, amountPaid } = req.body;
+
+    try {
+        // Update the student's information
+        await register_user.update({
+            firstName,
+            lastName,
+            gender,
+            yearLevel,
+            block
+        }, {
+            where: { userId: studentId }
+        });
+
+        // Update the remittance record
+        const remittanceRecord = await remittance.findOne({
+            where: { student: studentId, payable }
+        });
+
+        if (remittanceRecord) {
+            const newPaidAmount = remittanceRecord.paid + parseInt(amountPaid, 10);
+            const newBalance = remittanceRecord.balance - newPaidAmount;
+
+            await remittance.update({
+                paid: newPaidAmount,
+                balance: newBalance
+            }, {
+                where: { student: studentId, payable }
+            });
+        }
+
+        res.status(200).json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'An error occurred while updating student information.' });
+    }
+}
 
 module.exports = {
     login,
@@ -361,4 +598,9 @@ module.exports = {
     create_payable,
     Display_Student_Info,
     save_remittance,
+    login_post,
+    treasurer_3A_verify_remittance,
+    treasurer_3B_verify_remittance,
+    Treasurer_save_fund,
+    updateStudent
 };

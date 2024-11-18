@@ -26,29 +26,28 @@
         <nav class="nav">
             <a href="Treasurer_dashboard">DASHBOARD</a>
             <a href="Treasurer_create_payable">PAYABLE</a>
-
+            
             <div class="dropdown">
-                <a href="#" class="dropbtn" onclick="toggleDropdown('remittanceDropdown')">RECEIVE</a>
-                <span class="arrow" onclick="toggleDropdown('remittanceDropdown')"></span>
-                <div class="dropdown-content" id="remittanceDropdown">
+                <a href="#" class="dropbtn" onclick="toggleDropdown('receiveDropdown')">RECEIVE</a>
+                <span class="arrow" onclick="toggleDropdown('receiveDropdown')"></span>
+                <div class="dropdown-content" id="receiveDropdown">
                     <a href="Treasurer_BSIT_3A_remittance">BSIT-3A</a>
                     <a href="Treasurer_BSIT_3B_remittance">BSIT-3B</a>
                 </div>
             </div>
-            
-        <div class="dropdown">
-            <a href="#" class="dropbtn" onclick="toggleDropdown('remittanceDropdown')">REMITTANCE</a>
-            <span class="arrow" onclick="toggleDropdown('remittanceDropdown')"></span>
-            <div class="dropdown-content" id="remittanceDropdown">
-                <a href="#">BSIT-3A</a>
-                <a href="#">BSIT-3B</a>
-            </div>
-        </div>
-        
 
-            </div>
             <div class="dropdown">
-                <a href="#" class="dropbtn">REPORT</a>
+                <a href="#" class="dropbtn" onclick="toggleDropdown('remittanceDropdown')">REMITTANCE</a>
+                <span class="arrow" onclick="toggleDropdown('remittanceDropdown')"></span>
+                <div class="dropdown-content" id="remittanceDropdown">
+                    <a href="Treasurer_3A_verify_remittance">BSIT-3A</a>
+                    <a href="treasurer_3B_verify_remittance">BSIT-3B</a>
+                </div>
+            </div>
+            
+            <div class="dropdown">
+                <a href="#" class="dropbtn" onclick="toggleDropdown('reportDropdown')">REPORT</a>
+                <span class="arrow" onclick="toggleDropdown('reportDropdown')"></span>
                 <div class="dropdown-content" id="reportDropdown">
                     <a href="#">MONTHLY REPORT</a>
                     <a href="#">EXPENSES</a>
@@ -78,7 +77,7 @@
             <div class="select-group">
                 <select name="yearLevel" required>
                     <option value="" disabled selected>YEAR LEVEL</option>
-                    <option value="3">3rd Year</option>
+                    <option value="3">3RD YEAR</option>
                 </select>
                 <select name="block" required>
                     <option value="" disabled selected>BLOCK</option>
@@ -95,10 +94,9 @@
 
             <select name="role" id="role" required onchange="toggleAccess()">
                 <option value="" disabled selected>ROLE</option>
-                <option value="admin">Admin</option>
-                <option value="treasurer">Treasurer</option>
-                <option value="representative">Representative</option>
-                <option value="student">Student</option>
+                <option value="treasurer">TREASURER</option>
+                <option value="representative">REPRESENTATIVE</option>
+                <option value="student">STUDENT</option>
             </select>
 
             <input name="userName" type="text" id="username" placeholder="USERNAME" readonly required>

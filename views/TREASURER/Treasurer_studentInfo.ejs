@@ -5,222 +5,280 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Information</title>
     <link rel="stylesheet" href="/TREASURER_CSS/Treasurer_studentInfo.css">
-    <style>
-        input[type="number"]::-webkit-inner-spin-button,
-        input[type="number"]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        input[type="number"] {
-            -moz-appearance: textfield; 
-        }
-        .error-message {
-            color: red;
-            font-size: 14px;
-            margin-top: 10px;
-            display: none; /* Hidden by default */
-        }
-
-
-    .notification {
-        background-color: #f44336; /* Red */
-        color: white;
-        padding: 15px;
-        margin: 19px;
-        border-radius: 5px;
-        text-align: center;
-    }
-
-    </style>
 </head>
 <body>
-
-<header>
-    <div class="logo">
-        <img src="/BSIT_LOGO.png" alt="Logo">
-        <span class="BS">BSIT FUND COLLECTION<br><span class="IT"> MANAGEMENT SYSTEM</span></span>
-    </div>
-    <nav class="nav">
-        <a href="/Treasurer_dashboard">DASHBOARD</a>
-        <a href="/Treasurer_create_payable">PAYABLE</a>
-        <div class="dropdown">
-            <a href="javascript:void(0)" class="dropbtn" onclick="toggleDropdown('remittanceDropdown')">RECEIVE</a>
-            <div class="dropdown-content" id="remittanceDropdown" style="display: none;">
-                <a href="/Treasurer_BSIT_3A_remittance">BSIT-3A</a>
-                <a href="/Treasurer_BSIT_3B_remittance">BSIT-3B</a>
-            </div>
+    <header>
+        <div class="logo">
+            <img src="/BSIT_LOGO.png" alt="Logo">
+            <span class="BS">BSIT FUND COLLECTION<br><span class="IT"> MANAGEMENT SYSTEM</span></span>
         </div>
-        <a href="/Treasurer_register_user">REGISTER</a>
-        <img src="/user.jpg" alt="User Icon" class="user-icon">
-    </nav>
-</header>
-
-<% if (typeof message !== 'undefined') { %>
-    <div class="notification" id="notification">
-        <p><%= message %></p>
-    </div>
-<% } %>
-
-
-
-
-<div class="container">
-    <div class="info">
-        <h2><%= student.userId %> </h2>
-        <p><%= student.firstName %> <%= student.lastName %></p>
-        <p><%= student.gender %></p>
-        <p>BSIT -<%= student.yearLevel %><%= student.block %></p>
-    </div>
-
-    <form id="remittance-form" action="/api/remittances" method="POST" onsubmit="return validateForm()">
-        <input type="hidden" name="studentId" value="<%= student.userId %>">
-        <div class="scrollable-table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th style="width: 200px;">DATE</th>
-                        <th>PAYABLE</th>
-                        <th>PAID</th>
-                        <th>BALANCE</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% payables.forEach(payable => { %>
-                        <tr>
-                            <td class="paid-date" style="width: 100px;">
-                                <% 
-                                    const remittance = remittances.find(rem => rem.payable === payable.description); 
-                                %>
-                                <%= remittance ? remittance.date : '' %>
-                            </td>
-                            <td><%= payable.description %></td>
-                            <td>
-                                <input type="number" 
-                                    name="paidAmounts[<%= payable.id %>]" 
-                                    value="<%= payable.amountPaid !== undefined ? payable.amountPaid : (remittances.find(rem => rem.payable === payable.description)?.paid || 0) %>" 
-                                    data-amount="<%= payable.amount %>" 
-                                    class="paid-input" 
-                                    style="width: 100%; border: none; outline: none;"
-                                    onchange="updateTotals()">
-                            </td>
-                            <td class="balance"><%= Math.floor(payable.amount - (payable.amountPaid || 0)) %></td>
-                        </tr>
-                    <% }); %>
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td colspan="1">TOTAL</td>
-                        <td></td>
-                        <td class="total-paid">
-                            <%= Math.floor(payables.reduce((total, payable) => total + (payable.amountPaid || 0), 0)) %>
-                        </td>
-                        <td class="total-balance">
-                            <%= Math.floor(payables.reduce((total, payable) => total + (payable.amount - (payable.amountPaid || 0)), 0)) %>
-                        </td>
-                    </tr>       
-                </tfoot>
-            </table>
+        <nav class="nav">
+            <a href="Treasurer_dashboard">DASHBOARD</a>
+            <a href="Treasurer_create_payable">PAYABLE</a>
             
+            <div class="dropdown">
+                <a href="#" class="dropbtn" onclick="toggleDropdown('receiveDropdown')">RECEIVE</a>
+                <span class="arrow" onclick="toggleDropdown('receiveDropdown')"></span>
+                <div class="dropdown-content" id="receiveDropdown">
+                    <a href="Treasurer_BSIT_3A_remittance">BSIT-3A</a>
+                    <a href="Treasurer_BSIT_3B_remittance">BSIT-3B</a>
+                </div>
+            </div>
+            
+            <div class="dropdown">
+                <a href="#" class="dropbtn" onclick="toggleDropdown('remittanceDropdown')">REMITTANCE</a>
+                <span class="arrow" onclick="toggleDropdown('remittanceDropdown')"></span>
+                <div class="dropdown-content" id="remittanceDropdown">
+                    <a href="Treasurer_3A_verify_remittance">BSIT-3A</a>
+                    <a href="treasurer_3B_verify_remittance">BSIT-3B</a>
+                </div>
+            </div>
+
+            <div class="dropdown">
+                <a href="#" class="dropbtn" onclick="toggleDropdown('reportDropdown')">REPORT</a>
+                <span class="arrow" onclick="toggleDropdown('reportDropdown')"></span>
+                <div class="dropdown-content" id="reportDropdown">
+                    <a href="#">MONTHLY REPORT</a>
+                    <a href="#">EXPENSES</a>
+                </div>
+            </div>
+            <a href="Treasurer_register_user">REGISTER</a>
+            <img src="/user.jpg" alt="User Icon" class="user-icon">
+        </nav>
+    </header>
+
+    <% if (typeof message !== 'undefined') { %>
+        <div class="notification" id="notification">
+            <p><%= message %></p>
         </div>
-        <input type="hidden" name="date" id="remittance-date">
-        <button type="submit" class="Submit" id="receive-button">RECEIVE</button>
-    </form>
+    <% } %>
 
+    <div class="container">
+        <div class="info">
+            <h2><%= student.userId %></h2>
+            <p><%= student.firstName %> <%= student.lastName %> <button onclick="openEditModal()">Edit</button></p>
+            <p><%= student.gender %></p>
+            <p>BSIT - <%= student.yearLevel %> <%= student.block %></p>
+        </div>
 
+        <form id="remittance-form" name="studentId" action="/api/remittances" method="POST" onsubmit="return validateForm()">
+            <input type="hidden" name="studentId" value="<%= student.userId %>">
+            <input type="hidden" name="studentName" value="<%= student.firstName %> <%= student.lastName %>">
+            <input type="hidden" name="studentBlock" value="<%= student.block %>">
+            <input type="hidden" name="studentYearLevel" value="<%= student.yearLevel %>">
 
-    <script>
-        function toggleDropdown(dropdownId) {
-            const dropdowns = document.getElementsByClassName("dropdown-content");
-            for (let i = 0; i < dropdowns.length; i++) {
-                if (dropdowns[i].id !== dropdownId) {
-                    dropdowns[i].classList.remove('show');
-                }
-            }
-            const dropdown = document.getElementById(dropdownId);
-            dropdown.classList.toggle('show');
+            <div class="scrollable-table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 200px;">DATE</th>
+                            <th>PAYABLE</th>
+                            <th>AMOUNT PAID</th>
+                            <th>BALANCE</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% payables.forEach(payable => { %>
+                            <tr>
+                                <td class="paid-date" style="width: 100px;">
+                                    <% 
+                                        const remittance = remittances.find(rem => rem.payable === payable.description && rem.student === student.firstName + ' ' + student.lastName); 
+                                    %>
+                                    <%= remittance ? new Date(remittance.date).toLocaleDateString() : '' %> 
+                                </td>
+                                <td>
+                                    <%= payable.description %>
+                                    <input type="hidden" name="Description_<%= payable.id %>" value="<%= payable.description %>">
+                                </td>
+                                <td>
+                                    <input type="number" 
+                                        name="paidAmount_<%= payable.id %>"
+                                        value="<%= payable.amountPaid !== undefined ? payable.amountPaid : (remittances.find(rem => rem.payableId === payable.id)?.paid || 0) %>"
+                                        data-amount="<%= payable.amount %>" 
+                                        class="paid-input" 
+                                        style="width: 100%; border: none; outline: none;"
+                                        onchange="updateTotals()">
+                                </td>
+                                <td>
+                                    <%= payable.amount %>
+                                    <input type="hidden" name="balance<%= payable.id%>" value="<%= payable.amount %>">    
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="1">TOTAL</td>
+                            <td></td>
+                            <td class="total-paid">
+                                <%= Math.floor(payables.reduce((total, payable) => total + (payable.amountPaid || 0), 0)) %>
+                            </td>
+                            <td class="total-balance">
+                                <%= Math.floor(payables.reduce((total, payable) => total + (payable.amount - (payable.amountPaid || 0)), 0)) %>
+                            </td>   
+                        </tr>       
+                    </tfoot>
+                </table>
+            </div>
+
+            <input type="hidden" name="date" id="remittance-date">
+            <button type="submit" class="Submit" id="receive-button">RECEIVE</button>
+        </form>
+    </div>
+    
+<<!-- Modal for editing student info -->
+<div id="edit-modal" class="edit-modal">
+    <div class="modal-content">
+        <h3>Edit Student Information</h3>
+        <form id="edit-form" data-student-id="<%= student.userId %>" onsubmit="saveChanges(event)">
+
+            <!-- Hidden studentId input -->
+            <input type="hidden" name="studentId" value="<%= student.userId %>">
+
+            <!-- Fields for student information -->
+            <div class="name-container">
+                <div class="name-field">
+                    <label for="edit-first-name">First Name:</label>
+                    <input type="text" id="edit-first-name" name="firstName" value="<%= student.firstName %>">
+                </div>
+                <div class="name-field">
+                    <label for="edit-last-name">Last Name:</label>
+                    <input type="text" id="edit-last-name" name="lastName" value="<%= student.lastName %>">
+                </div>
+            </div>
+
+            <div class="gender-yearLevel-container">
+                <div class="gender-field">
+                    <label for="edit-gender">Gender:</label>
+                    <select id="edit-gender" name="gender">
+                        <option value="Male" <%= student.gender === 'Male' ? 'selected' : '' %>>Male</option>
+                        <option value="Female" <%= student.gender === 'Female' ? 'selected' : '' %>>Female</option>
+                        <option value="Other" <%= student.gender === 'Other' ? 'selected' : '' %>>Other</option>
+                    </select>
+                </div>
+                <div class="yearLevel-field">
+                    <label for="edit-yearLevel">Year Level:</label>
+                    <select id="edit-yearLevel" name="yearLevel">
+                        <option value="2" <%= student.yearLevel === '2' ? 'selected' : '' %>>3rd Year</option>
+                    </select>
+                </div>
+            </div>
+
+            <label for="edit-block">Block:</label>
+            <input type="text" id="edit-block" name="block" value="<%= student.block %>">
+
+            <!-- Payable Dropdown -->
+            <div class="payable-field">
+                <label for="edit-payable">Payable:</label>
+                <select id="edit-payable" name="payable" onchange="updateAmountAndPaid()">
+                    <% payables.forEach(function(payable) { %>
+                        <option value="<%= payable.id %>" 
+                                data-amount="<%= payable.amount %>" 
+                                data-paid="<%= payable.amountPaid || 0 %>"
+                                <%= student.payable === payable.id ? 'selected' : '' %> >
+                            <%= payable.description %>
+                        </option>
+                    <% }); %>
+                </select>
+            </div>
+
+            <!-- Amount Paid -->
+            <div class="amount-paid-field">
+                <label for="edit-amount-paid">Amount Paid:</label>
+                <input type="number" id="edit-amount-paid" name="amountPaid">
+            </div>
+
+            <button type="Sumbit" onclick="saveChanges()">Save Changes</button>
+            <button type="button" class="cancel" onclick="closeEditModal()">Cancel</button>
+        </form>
+    </div>
+</div>
+<script>
+    // Function to update the amount paid based on the selected payable
+    function updateAmountAndPaid() {
+        const payableSelect = document.getElementById('edit-payable');
+        const amountPaidInput = document.getElementById('edit-amount-paid');
+
+        const selectedOption = payableSelect.options[payableSelect.selectedIndex];
+        
+        // Get the 'data-paid' attribute from the selected option (default to 0 if not set)
+        const amountPaid = selectedOption.getAttribute('data-paid') || 0;
+
+        // Update the amount paid input field
+        amountPaidInput.value = amountPaid;
+    }
+
+    // Automatically update amount paid when the page loads
+    window.onload = function () {
+        updateAmountAndPaid();
+    };
+
+    // Function to open the edit modal
+    function openEditModal() {
+        const modal = document.getElementById('edit-modal');
+        modal.style.display = 'flex';
+    }
+
+    // Function to close the edit modal
+    function closeEditModal() {
+        const modal = document.getElementById('edit-modal');
+        modal.style.display = 'none';
+    }
+
+// Save changes to the student info
+function saveChanges(event) {
+    event.preventDefault();  // Prevent the form from submitting traditionally
+
+    const form = document.getElementById('edit-form');
+    const formData = new FormData(form);
+
+    const studentId = formData.get('studentId');
+    const firstName = formData.get('firstName');
+    const lastName = formData.get('lastName');
+    const gender = formData.get('gender');
+    const yearLevel = formData.get('yearLevel');
+    const block = formData.get('block');
+    const payable = formData.get('payable');
+    const amountPaid = formData.get('amountPaid');
+
+    const data = {
+        studentId,
+        firstName,
+        lastName,
+        gender,
+        yearLevel,
+        block,
+        payable,
+        amountPaid
+    };
+
+    // Send data to the server to update the database
+    fetch('/updateStudent', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Changes saved successfully!');
+            closeEditModal();  // Close the modal after saving
+        } else {
+            alert('Error saving changes!');
         }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
 
-        window.onclick = function(event) {
-            if (!event.target.matches('.dropbtn') && !event.target.matches('.arrow')) {
-                const dropdowns = document.getElementsByClassName("dropdown-content");
-                for (let i = 0; i < dropdowns.length; i++) {
-                    const openDropdown = dropdowns[i];
-                    if (openDropdown.classList.contains('show')) {
-                        openDropdown.classList.remove('show');
-                    }
-                }
-            }
-        }
+</script>
 
-        function updateTotals() {
-            const totalPaidCells = document.querySelectorAll('.total-paid');
-            const totalBalanceCells = document.querySelectorAll('.total-balance');
-            let totalPaid = 0;
-            let totalBalance = 0;
-            let hasNegativeBalance = false;
 
-            document.querySelectorAll('.paid-input').forEach(input => {
-                const paidAmount = parseFloat(input.value) || 0;
-                const payableAmount = parseFloat(input.dataset.amount);
-                const balance = payableAmount - paidAmount;
 
-                const row = input.closest('tr');
-                const balanceCell = row.querySelector('.balance');
-                balanceCell.textContent = Math.floor(balance);
 
-                totalPaid += paidAmount;
-                totalBalance += balance;
 
-                // Check if any balance is negative
-                if (balance < 0) {
-                    hasNegativeBalance = true;
-                }
-
-                // Update the date only for the current row if paid amount is greater than 0
-                if (paidAmount > 0) {
-                    const today = new Date();
-                    const dateStr = today.toISOString().split('T')[0]; // YYYY-MM-DD format
-                    document.getElementById('remittance-date').value = dateStr;
-
-                    const paidDateCell = row.querySelector('.paid-date');
-                    paidDateCell.textContent = dateStr;
-                }
-            });
-
-            totalPaidCells.forEach(cell => cell.textContent = Math.floor(totalPaid));
-            totalBalanceCells.forEach(cell => cell.textContent = Math.floor(totalBalance));
-
-            toggleReceiveButton(totalPaid); 
-
-            // Display error message if there is a negative balance
-            const errorMessage = document.getElementById('error-message');
-            if (hasNegativeBalance) {
-                errorMessage.textContent = "One or more payments exceed the balance. Negative balances are not allowed.";
-                errorMessage.style.display = "block";  // Show the error message
-            } else {
-                errorMessage.style.display = "none"; // Hide the error message
-            }
-        }
-
-        function toggleReceiveButton(totalPaid) {
-            const receiveButton = document.getElementById('receive-button');
-            receiveButton.disabled = totalPaid <= 0; 
-        }
-
-        function setCurrentDate() {
-            const today = new Date();
-            const dateStr = today.toISOString().split('T')[0]; // YYYY-MM-DD format
-            document.getElementById('remittance-date').value = dateStr;
-        }
-
-        // Set the current date on page load
-        window.onload = setCurrentDate;
-
-        document.querySelectorAll('.paid-input').forEach(input => {
-            input.addEventListener('change', () => {
-                updateTotals();
-            });
-        });
-    </script>
 </body>
 </html>

@@ -162,7 +162,9 @@ button:hover {
   transform: translateX(-50%); 
   z-index: 1000; 
 }
-
+input {
+  text-transform: uppercase;
+}
 
 
 @keyframes fadeIn {

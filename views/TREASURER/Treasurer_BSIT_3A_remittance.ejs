@@ -30,8 +30,8 @@
                 <a href="#" class="dropbtn" onclick="toggleDropdown('remittanceDropdown')">REMITTANCE</a>
                 <span class="arrow" onclick="toggleDropdown('remittanceDropdown')"></span>
                 <div class="dropdown-content" id="remittanceDropdown">
-                    <a href="#">BSIT-3A</a>
-                    <a href="#">BSIT-3B</a>
+                    <a href="Treasurer_3A_verify_remittance">BSIT-3A</a>
+                    <a href="treasurer_3B_verify_remittance">BSIT-3B</a>
                 </div>
             </div>
             
@@ -47,10 +47,10 @@
             <img src="/user.jpg" alt="User Icon" class="user-icon">
         </nav>
     </header>
-
+    
     <div class="container">
         <p><strong><%= blockKey %></strong></p>
-        
+    
         <% representativeNames.forEach(name => { %>
             <p><strong>Representative:</strong> <%= name %></p>
         <% }); %>
@@ -74,14 +74,13 @@
                             let userTotalPaid = 0;
                             let userTotalBalance = 0;
                             let payableDescriptions = userPayables.map(p => p.description).join(', ');
+    
+                            // Find the remittance for the user
+                            const userRemittance = remittances.filter(rem => rem.student === `${user.firstName} ${user.lastName}`);
                             
-                            if (userPayables.length > 0) {
-                                userPayables.forEach(payable => {
-                                    userTotalPaid += payable.amountPaid || 0;
-                                    userTotalBalance += (payable.amount || 0) - (payable.amountPaid || 0);
-                                });
-                            }
+                            console.log('User Remittance:', userRemittance); // Debugging line to check remittances
                         %>
+                        
                         <tr>
                             <td>
                                 <a href="/Display_Student_Info/<%= user.userId %>" class="no-underline">
@@ -92,14 +91,30 @@
                                 <% if (userPayables.length > 0) { %>
                                     <%= payableDescriptions %>
                                 <% } else { %>
-                                    No payable information available
+                                    No payables
                                 <% } %>
                             </td>
                             <td>
-                                <%= userTotalPaid %>
+                                <% 
+                                    let totalPaidForUser = userRemittance.reduce((total, rem) => total + (rem.paid || 0), 0);
+                                    if (userPayables.length === 0) {
+                                        totalPaidForUser = 0; // Default for users with no payables
+                                    }
+                                %>
+                                <%= totalPaidForUser || 0 %> 
                             </td>
                             <td>
-                                <%= userTotalBalance %>
+                                <% 
+                                    if (userPayables.length === 0) {
+                                        userTotalBalance = 0; // Default balance if no payables
+                                    } else {
+                                        userPayables.forEach(payable => {
+                                            userTotalPaid += payable.amountPaid || 0;
+                                            userTotalBalance += (payable.amount || 0) - (payable.amountPaid || 0);
+                                        });
+                                    }
+                                %>
+                                <%= userTotalBalance || 0 %> 
                             </td>
                         </tr>
                         <% 
@@ -112,32 +127,17 @@
                     <tr>
                         <td>Total</td>
                         <td></td>
-                        <td><%= totalAmountPaid %></td>
-                        <td><%= totalBalance %></td>
+                        <td>
+                            <%= Math.floor(payables.reduce((total, payable) => total + (payable.amountPaid || 0), 0)) %>
+                        </td> 
+                        <td><%= totalBalance || 0 %></td>
                     </tr>
                 </tfoot>
             </table>
         </div>
     </div>
-
+    
     <script src="/TREASURER_JS/Treasurer_BSIT_3A_remittance.js"></script>
-    <script>
-        function toggleDropdown(id) {
-            var dropdown = document.getElementById(id);
-            dropdown.classList.toggle("show");
-        }
-
-        window.onclick = function(event) {
-            if (!event.target.matches('.dropbtn') && !event.target.matches('.arrow')) {
-                var dropdowns = document.getElementsByClassName("dropdown-content");
-                for (var i = 0; i < dropdowns.length; i++) {
-                    var openDropdown = dropdowns[i];
-                    if (openDropdown.classList.contains('show')) {
-                        openDropdown.classList.remove('show');
-                    }
-                }
-            }
-        }
-    </script>
 </body>
 </html>
+     

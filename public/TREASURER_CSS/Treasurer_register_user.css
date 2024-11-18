@@ -46,13 +46,14 @@ header {
   color: green;
   font-weight: bold;
   padding: 10px 15px;
-  transition: background-color 0.3s; 
+  transition: background-color 0.3s;
 }
 
 .nav a:hover {
-  background-color: #d1e7dd; 
+  background-color: #d1e7dd;
   border-radius: 5px;
 }
+
 
 .dropdown {
   position: relative;
@@ -170,6 +171,9 @@ button:hover {
   top: 18%; 
   transform: translateX(-50%); 
   z-index: 1000; 
+}
+input {
+  text-transform: uppercase;
 }
 
 

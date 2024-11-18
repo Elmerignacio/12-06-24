@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Treasurer Remittance</title>
-    <link rel="stylesheet" href="/TREASURER_CSS/Treasurer_remmitance.css">        
+    <link rel="stylesheet" href="/TREASURER_CSS/Treasurer_verify_remittance.css">        
 </head>
 <body>
     <header>
@@ -29,8 +29,8 @@
                 <a href="#" class="dropbtn" onclick="toggleDropdown('remittanceDropdown')">REMITTANCE</a>
                 <span class="arrow" onclick="toggleDropdown('remittanceDropdown')"></span>
                 <div class="dropdown-content" id="remittanceDropdown">
-                    <a href="#">BSIT-3A</a>
-                    <a href="#">BSIT-3B</a>
+                    <a href="Treasurer_3A_verify_remittance">BSIT-3A</a>
+                    <a href="treasurer_3B_verify_remittance">BSIT-3B</a>
                 </div>
             </div>
             
@@ -50,52 +50,206 @@
     <div class="container">
         <p><strong><%= blockKey %></strong></p>
         
-        <% representativeNames.forEach(name => { %>
-            <p><strong>Representative:</strong> <%= name %></p>
-        <% }); %>
-
+        <% if (representativeNames.length > 0) { %>
+            <% representativeNames.forEach(name => { %>
+                <p><strong>Representative:</strong> <%= name %></p>
+            <% }); %>
+        <% } else { %>
+            <p><strong>No representatives available.</strong></p>
+        <% } %>
+    
         <div class="scrollable-table-container">
             <table>
                 <thead>
                     <tr>
+                        <th>Date</th>
                         <th>Student Name</th>
                         <th>Payment</th>
                         <th>Amount Paid</th>
-                        <th>Remitted By</th>
+                        <th>Remitted by</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <% payables.forEach(payable => { %>
+                    <% let totalAmountPaid = 0; %>
+                    <% let totalBalance = 0; %>
+                    <% studentRemittances.forEach(remittance => { %>
                         <tr>
-                            <td><%= payable.student %></td>
-                            <td><%= payable.payableDescription %></td>
-                            <td><%= payable.amountPaid %></td>
-                            <td><%= payable.remittedBy %></td>
+                            <td><%= remittance.date%></td>
+                            <td><%= remittance.studentName %></td>
+                            <td><%= remittance.payment %></td>
+                            <td><%= remittance.amountPaid %></td>
+                            <td><%= remittance.studentName %></td>
                         </tr>
+                        
+                        <% 
+                            totalAmountPaid += remittance.amountPaid || 0;
+                            totalBalance += (remittance.amount - remittance.amountPaid) || 0;
+                        %>
                     <% }); %>
                 </tbody>
+                <tfoot>
+                    <tr>
+                        <td>Total</td>
+                        <td></td>
+                        <td></td>
+                        <td><%= totalAmountPaid %></td>
+                        <td></td>
+                    </tr>
+                </tfoot>
             </table>
+
+            <div class="flex">
+                <p>Total amount to receive is <%= totalAmountPaid %></p>  
+                <button type="button" class="verify-btn" onclick="openPopup()">Verify</button>
+            </div>
         </div>
     </div>
 
-    <script src="/TREASURER_JS/Treasurer_BSIT_3A_remittance.js"></script>
+    <form id="popupForm" class="popup-form" action="Treasurer_save_fund" method="post">
+        <div class="popup-content">
+            <span class="close" onclick="closePopup()">&times;</span>
+    
+            <div class="remittance-table">  
+                <h2>REMITTANCE</h2>
+                <span class="span"><%= blockKey %></span>
+                <label for="date">Date:</label>
+                <input type="date" id="date">
+    
+                <table>
+                    <thead>
+                        <tr>
+                            <th>DENOMINATION</th>
+                            <th>AMOUNT</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1,000</td>
+                            <td><input type="number" class="amount-input" data-denomination="1000" min="0"></td>
+                        </tr>
+                        <tr>
+                            <td>500</td>
+                            <td><input type="number" class="amount-input" data-denomination="500" min="0"></td>
+                        </tr>
+                        <tr>
+                            <td>200</td>
+                            <td><input type="number" class="amount-input" data-denomination="200" min="0"></td>
+                        </tr>
+                        <tr>
+                            <td>100</td>
+                            <td><input type="number" class="amount-input" data-denomination="100" min="0"></td>
+                        </tr>
+                        <tr>
+                            <td>50</td>
+                            <td><input type="number" class="amount-input" data-denomination="50" min="0"></td>
+                        </tr>
+                        <tr>
+                            <td>20</td>
+                            <td><input type="number" class="amount-input" data-denomination="20" min="0"></td>
+                        </tr>
+                        <tr>
+                            <td>coins</td>
+                            <td><input type="number" class="amount-input" data-denomination="1" min="0"></td>
+                        </tr>
+                        <tr>
+                            <td>Total Amount Remitted</td>
+                            <td>₱<span id="totalAmount">0.00</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+    
+                <p class="Amount">Amount Collected: ₱<span id="collectedAmount">0.00</span></p>
+    
+                <p class="Status"><strong>Status:</strong> <span id="status"></span></p>
+    
+                <button type="submit" class="receive-btn" >RECEIVE</button>
+            </div>
+        </div>
+</form>
+    
+  
+
     <script>
+    function calculateTotal() {
+        var amountInputs = document.querySelectorAll('.amount-input');
+        var totalAmount = 0;
+
+   
+        amountInputs.forEach(function(input) {
+            var denomination = parseFloat(input.getAttribute('data-denomination'));
+            var amount = parseInt(input.value) || 0; 
+            totalAmount += denomination * amount;
+        });
+
+        document.getElementById('totalAmount').textContent = totalAmount.toFixed(2); 
+        document.getElementById('collectedAmount').textContent = totalAmount.toFixed(2); 
+
+        document.getElementById('status').textContent = "Amount calculated successfully!";
+    }
+
+    document.querySelectorAll('.amount-input').forEach(function(input) {
+        input.addEventListener('input', calculateTotal);
+    });
+
         function toggleDropdown(id) {
-            var dropdown = document.getElementById(id);
+            const dropdown = document.getElementById(id);
             dropdown.classList.toggle("show");
         }
-
-        window.onclick = function(event) {
-            if (!event.target.matches('.dropbtn') && !event.target.matches('.arrow')) {
-                var dropdowns = document.getElementsByClassName("dropdown-content");
-                for (var i = 0; i < dropdowns.length; i++) {
-                    var openDropdown = dropdowns[i];
-                    if (openDropdown.classList.contains('show')) {
-                        openDropdown.classList.remove('show');
-                    }
-                }
-            }
+        function openPopup() {
+            document.getElementById("popupForm").style.display = "flex";
         }
+
+        function closePopup() {
+            document.getElementById("popupForm").style.display = "none";
+        }
+
+        function calculateTotal() {
+            const amountInputs = document.querySelectorAll(".amount-input");
+            let total = 0;
+            amountInputs.forEach(input => {
+                const denomination = parseFloat(input.getAttribute("data-denomination"));
+                const amount = parseFloat(input.value) || 0;
+                total += denomination * amount;
+            });
+
+            document.getElementById("totalAmount").textContent = total.toFixed(2);
+            updateCollectedAmount(); 
+        }
+
+        function updateCollectedAmount() {
+    const selectedDate = document.getElementById("date").value;
+    const tableRows = document.querySelectorAll(".scrollable-table-container tbody tr");
+    let collectedAmount = 0;
+    let hasPayables = false; 
+    let statusText = "";
+
+    tableRows.forEach(row => {
+        const rowDate = row.querySelector("td:first-child").textContent.trim();
+        const amountPaid = parseFloat(row.querySelector("td:nth-child(4)").textContent.trim()) || 0;
+        if (rowDate === selectedDate) {
+            collectedAmount += amountPaid;
+            hasPayables = true;  
+        }
+    });
+
+    if (hasPayables) {
+        document.getElementById("collectedAmount").textContent = `${collectedAmount.toFixed(2)}`;
+        statusText = "Pending"; 
+        document.querySelector(".scrollable-table-container table").style.pointerEvents = "auto";
+    } else {
+        document.getElementById("collectedAmount").textContent = "0.00";
+        statusText = "No payables"; 
+        document.querySelector(".scrollable-table-container table").style.pointerEvents = "none";
+    }
+
+    const statusElement = document.getElementById("status");
+    if (statusElement) {
+        statusElement.textContent = statusText;
+    }
+}
+
+
+        document.getElementById("date").addEventListener("change", updateCollectedAmount);
     </script>
 </body>
 </html>
