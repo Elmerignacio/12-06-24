@@ -14,27 +14,27 @@
             <span class="BS">BSIT FUND COLLECTION<br><span class="IT"> MANAGEMENT SYSTEM</span></span>
         </div>
         <nav class="nav">
-            <a href="Treasurer_dashboard">DASHBOARD</a>
-            <a href="Treasurer_create_payable">PAYABLE</a>
+            <a href="/Treasurer_dashboard">DASHBOARD</a>
+            <a href="/Treasurer_create_payable">PAYABLE</a>
             
             <div class="dropdown">
                 <a href="#" class="dropbtn" onclick="toggleDropdown('receiveDropdown')">RECEIVE</a>
                 <span class="arrow" onclick="toggleDropdown('receiveDropdown')"></span>
                 <div class="dropdown-content" id="receiveDropdown">
-                    <a href="Treasurer_BSIT_3A_remittance">BSIT-3A</a>
-                    <a href="Treasurer_BSIT_3B_remittance">BSIT-3B</a>
+                    <a href="/Treasurer_BSIT_3A_remittance">BSIT-3A</a>
+                    <a href="/Treasurer_BSIT_3B_remittance">BSIT-3B</a>
                 </div>
             </div>
-
+    
             <div class="dropdown">
                 <a href="#" class="dropbtn" onclick="toggleDropdown('remittanceDropdown')">REMITTANCE</a>
                 <span class="arrow" onclick="toggleDropdown('remittanceDropdown')"></span>
                 <div class="dropdown-content" id="remittanceDropdown">
-                    <a href="Treasurer_3A_verify_remittance">BSIT-3A</a>
-                    <a href="treasurer_3B_verify_remittance">BSIT-3B</a>
+                    <a href="/Treasurer_3A_verify_remittance">BSIT-3A</a>
+                    <a href="/Treasurer_3B_verify_remittance">BSIT-3B</a>
                 </div>
             </div>
-            
+    
             <div class="dropdown">
                 <a href="#" class="dropbtn" onclick="toggleDropdown('reportDropdown')">REPORT</a>
                 <span class="arrow" onclick="toggleDropdown('reportDropdown')"></span>
@@ -43,10 +43,12 @@
                     <a href="#">EXPENSES</a>
                 </div>
             </div>
-            <a href="Treasurer_register_user">REGISTER</a>
+            
+            <a href="/Treasurer_register_user">REGISTER</a>
             <img src="/user.jpg" alt="User Icon" class="user-icon">
         </nav>
     </header>
+    
     
     <div class="container">
         <p><strong><%= blockKey %></strong></p>

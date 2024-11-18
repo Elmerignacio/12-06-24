@@ -2,7 +2,7 @@ const express = require('express');
 const middleware = require("../middleware/authmiddleware.js")
 const route = express.Router();
 const model = require('../models')
-const admin_controller = require('../Constroller/route_controller');
+const admin_controller = require('../Constroller/admin_controller.js');
 
 
 route.get('/login', admin_controller.login)
@@ -31,7 +31,7 @@ route.get('/treasurer_3A_verify_remittance',middleware.authenticateJWT, admin_co
 route.get('/treasurer_3B_verify_remittance',middleware.authenticateJWT, admin_controller.treasurer_3B_verify_remittance)
 
 route.post('/Treasurer_save_fund',middleware.authenticateJWT,admin_controller.Treasurer_save_fund)
-route.post('/updateStudent/:id',middleware.authenticateJWT,admin_controller.updateStudent)
+route.post('/updateStudent',middleware.authenticateJWT,admin_controller.updateStudent)
 
 
 

@@ -13,27 +13,27 @@
             <span class="BS">BSIT FUND COLLECTION<br><span class="IT"> MANAGEMENT SYSTEM</span></span>
         </div>
         <nav class="nav">
-            <a href="Treasurer_dashboard">DASHBOARD</a>
-            <a href="Treasurer_create_payable">PAYABLE</a>
+            <a href="/Treasurer_dashboard">DASHBOARD</a>
+            <a href="/Treasurer_create_payable">PAYABLE</a>
             
             <div class="dropdown">
                 <a href="#" class="dropbtn" onclick="toggleDropdown('receiveDropdown')">RECEIVE</a>
                 <span class="arrow" onclick="toggleDropdown('receiveDropdown')"></span>
                 <div class="dropdown-content" id="receiveDropdown">
-                    <a href="Treasurer_BSIT_3A_remittance">BSIT-3A</a>
-                    <a href="Treasurer_BSIT_3B_remittance">BSIT-3B</a>
+                    <a href="/Treasurer_BSIT_3A_remittance">BSIT-3A</a>
+                    <a href="/Treasurer_BSIT_3B_remittance">BSIT-3B</a>
                 </div>
             </div>
-            
+    
             <div class="dropdown">
                 <a href="#" class="dropbtn" onclick="toggleDropdown('remittanceDropdown')">REMITTANCE</a>
                 <span class="arrow" onclick="toggleDropdown('remittanceDropdown')"></span>
                 <div class="dropdown-content" id="remittanceDropdown">
-                    <a href="Treasurer_3A_verify_remittance">BSIT-3A</a>
-                    <a href="treasurer_3B_verify_remittance">BSIT-3B</a>
+                    <a href="/Treasurer_3A_verify_remittance">BSIT-3A</a>
+                    <a href="/Treasurer_3B_verify_remittance">BSIT-3B</a>
                 </div>
             </div>
-
+    
             <div class="dropdown">
                 <a href="#" class="dropbtn" onclick="toggleDropdown('reportDropdown')">REPORT</a>
                 <span class="arrow" onclick="toggleDropdown('reportDropdown')"></span>
@@ -42,11 +42,12 @@
                     <a href="#">EXPENSES</a>
                 </div>
             </div>
-            <a href="Treasurer_register_user">REGISTER</a>
+            
+            <a href="/Treasurer_register_user">REGISTER</a>
             <img src="/user.jpg" alt="User Icon" class="user-icon">
         </nav>
     </header>
-
+    
     <% if (typeof message !== 'undefined') { %>
         <div class="notification" id="notification">
             <p><%= message %></p>
@@ -126,71 +127,57 @@
         </form>
     </div>
     
-<<!-- Modal for editing student info -->
+<!-- Modal for editing student info -->
 <div id="edit-modal" class="edit-modal">
     <div class="modal-content">
         <h3>Edit Student Information</h3>
-        <form id="edit-form" data-student-id="<%= student.userId %>" onsubmit="saveChanges(event)">
-
+        <form action="/updateStudent" method="POST">
             <!-- Hidden studentId input -->
             <input type="hidden" name="studentId" value="<%= student.userId %>">
-
+        
             <!-- Fields for student information -->
-            <div class="name-container">
-                <div class="name-field">
-                    <label for="edit-first-name">First Name:</label>
-                    <input type="text" id="edit-first-name" name="firstName" value="<%= student.firstName %>">
-                </div>
-                <div class="name-field">
-                    <label for="edit-last-name">Last Name:</label>
-                    <input type="text" id="edit-last-name" name="lastName" value="<%= student.lastName %>">
-                </div>
-            </div>
-
-            <div class="gender-yearLevel-container">
-                <div class="gender-field">
-                    <label for="edit-gender">Gender:</label>
-                    <select id="edit-gender" name="gender">
-                        <option value="Male" <%= student.gender === 'Male' ? 'selected' : '' %>>Male</option>
-                        <option value="Female" <%= student.gender === 'Female' ? 'selected' : '' %>>Female</option>
-                        <option value="Other" <%= student.gender === 'Other' ? 'selected' : '' %>>Other</option>
-                    </select>
-                </div>
-                <div class="yearLevel-field">
-                    <label for="edit-yearLevel">Year Level:</label>
-                    <select id="edit-yearLevel" name="yearLevel">
-                        <option value="2" <%= student.yearLevel === '2' ? 'selected' : '' %>>3rd Year</option>
-                    </select>
-                </div>
-            </div>
-
+            <label for="edit-first-name">First Name:</label>
+            <input type="text" id="edit-first-name" name="firstName" value="<%= student.firstName %>">
+        
+            <label for="edit-last-name">Last Name:</label>
+            <input type="text" id="edit-last-name" name="lastName" value="<%= student.lastName %>">
+        
+            <label for="edit-gender">Gender:</label>
+            <select id="edit-gender" name="gender">
+                <option value="Male" <%= student.gender === 'Male' ? 'selected' : '' %>>Male</option>
+                <option value="Female" <%= student.gender === 'Female' ? 'selected' : '' %>>Female</option>
+                <option value="Other" <%= student.gender === 'Other' ? 'selected' : '' %>>Other</option>
+            </select>
+        
+            <label for="edit-yearLevel">Year Level:</label>
+            <select id="edit-yearLevel" name="yearLevel">
+                <option value="3" <%= student.yearLevel === '3' ? 'selected' : '' %>>3rd Year</option>
+            </select>
+        
             <label for="edit-block">Block:</label>
             <input type="text" id="edit-block" name="block" value="<%= student.block %>">
-
+        
             <!-- Payable Dropdown -->
-            <div class="payable-field">
-                <label for="edit-payable">Payable:</label>
-                <select id="edit-payable" name="payable" onchange="updateAmountAndPaid()">
-                    <% payables.forEach(function(payable) { %>
-                        <option value="<%= payable.id %>" 
-                                data-amount="<%= payable.amount %>" 
-                                data-paid="<%= payable.amountPaid || 0 %>"
-                                <%= student.payable === payable.id ? 'selected' : '' %> >
-                            <%= payable.description %>
-                        </option>
-                    <% }); %>
-                </select>
-            </div>
-
+            <label for="edit-payable">Payable:</label>
+            <select id="edit-payable" name="payable">
+                <% payables.forEach(function(payable) { %>
+                    <option value="<%= payable.id %>" 
+                            data-amount="<%= payable.amount %>" 
+                            data-paid="<%= payable.amountPaid || 0 %>"
+                            <%= student.payable === payable.id ? 'selected' : '' %>>
+                        <%= payable.description %>
+                    </option>
+                <% }); %>
+            </select>
+        
             <!-- Amount Paid -->
-            <div class="amount-paid-field">
-                <label for="edit-amount-paid">Amount Paid:</label>
-                <input type="number" id="edit-amount-paid" name="amountPaid">
-            </div>
-
-            <button type="Sumbit" onclick="saveChanges()">Save Changes</button>
+            <label for="edit-amount-paid">Amount Paid:</label>
+            <input type="number" id="edit-amount-paid" name="amountPaid">
+        
+            <button type="submit">Save Changes</button>
             <button type="button" class="cancel" onclick="closeEditModal()">Cancel</button>
         </form>
+        
     </div>
 </div>
 <script>
@@ -224,55 +211,6 @@
         const modal = document.getElementById('edit-modal');
         modal.style.display = 'none';
     }
-
-// Save changes to the student info
-function saveChanges(event) {
-    event.preventDefault();  // Prevent the form from submitting traditionally
-
-    const form = document.getElementById('edit-form');
-    const formData = new FormData(form);
-
-    const studentId = formData.get('studentId');
-    const firstName = formData.get('firstName');
-    const lastName = formData.get('lastName');
-    const gender = formData.get('gender');
-    const yearLevel = formData.get('yearLevel');
-    const block = formData.get('block');
-    const payable = formData.get('payable');
-    const amountPaid = formData.get('amountPaid');
-
-    const data = {
-        studentId,
-        firstName,
-        lastName,
-        gender,
-        yearLevel,
-        block,
-        payable,
-        amountPaid
-    };
-
-    // Send data to the server to update the database
-    fetch('/updateStudent', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('Changes saved successfully!');
-            closeEditModal();  // Close the modal after saving
-        } else {
-            alert('Error saving changes!');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
-}
 
 </script>
 

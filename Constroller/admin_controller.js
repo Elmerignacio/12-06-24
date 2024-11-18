@@ -42,7 +42,6 @@ const login_post = async (req, res) => {
     }
  
 };
-
 const Admin_dashboard = (req, res) => {
     res.render('Admin_dashboard');
 };
@@ -50,6 +49,8 @@ const Admin_dashboard = (req, res) => {
 const Admin_register_user = (req, res) => {
     res.render('Admin_register_user');
 };
+
+
 const register_user_by_role = (req, res) => {
     const register_post_db = {
         userId: req.body.userId,
@@ -68,7 +69,7 @@ const register_user_by_role = (req, res) => {
         return res.status(status).render("Treasurer_register_user", { message: "Something went wrong, please try again!" });
     };
 
-    model.register_user.findOne({ where: { userId: register_post_db.userId } })
+model.register_user.findOne({ where: { userId: register_post_db.userId } })
         .then(existingUser => {
             if (existingUser) {
                 return res.status(400).render("Treasurer_register_user", {
@@ -544,50 +545,85 @@ const Treasurer_save_fund = (req, res)=> {
     const { yearlevel, block, amount, date } = req.body;
  
 }
+const updateStudent = (req, res) => {
+    const { studentId, firstName, lastName, gender, yearLevel, block, payable: payableId, amountPaid } = req.body;
 
-const updateStudent = async (req, res) => {
-    const { studentId, firstName, lastName, gender, yearLevel, block, payable, amountPaid } = req.body;
+    // Check required fields
+    if (!studentId || !payableId || !amountPaid) {
+        return res.status(400).json({ success: false, message: 'Missing required fields.' });
+    }
 
-    try {
-        // Update the student's information
-        await register_user.update({
-            firstName,
-            lastName,
-            gender,
-            yearLevel,
-            block
-        }, {
-            where: { userId: studentId }
-        });
+    // Step 1: Update student record in register_user
+    model.register_user.update(
+        { firstName, lastName, gender, yearLevel, block },
+        { where: { userId: studentId } }
+    )
+    .then(() => {
+        console.log("Student record updated successfully.");
+        // Step 2: Find and update payable record
+        return model.payable.findOne({ where: { id: payableId } });
+    })
+    .then((payableRecord) => {
+        if (!payableRecord) {
+            throw new Error('Payable record not found.');
+        }
+        console.log("Payable record found: ", payableRecord);
 
-        // Update the remittance record
-        const remittanceRecord = await remittance.findOne({
-            where: { student: studentId, payable }
-        });
+        const newPaidAmount = (payableRecord.amountPaid || 0) + parseFloat(amountPaid);
+        const newBalance = (payableRecord.amount || 0) - parseFloat(amountPaid);
 
-        if (remittanceRecord) {
-            const newPaidAmount = remittanceRecord.paid + parseInt(amountPaid, 10);
-            const newBalance = remittanceRecord.balance - newPaidAmount;
-
-            await remittance.update({
-                paid: newPaidAmount,
-                balance: newBalance
-            }, {
-                where: { student: studentId, payable }
-            });
+        if (newBalance < 0) {
+            throw new Error('Amount paid exceeds the total payable amount.');
         }
 
-        res.status(200).json({ success: true });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ success: false, message: 'An error occurred while updating student information.' });
-    }
-}
+        // Step 3: Update payable record
+        return model.payable.update(
+            { student: `${firstName} ${lastName}`, amountPaid: newPaidAmount, amount: newBalance }, // Updated student attributes
+            { where: { id: payableId } }
+        );  
+    })
+    .then(() => {
+        console.log("Payable record updated successfully.");
+        // Step 4: Find and update remittance record
+        return model.remittance.findOne({ where: { payable: payableId, student: `${firstName} ${lastName}` } });
+    })
+    .then((remittanceRecord) => {
+        if (remittanceRecord) {
+            console.log("Remittance record found: ", remittanceRecord);
+            const newBalance = remittanceRecord.balance - parseFloat(amountPaid);
+
+            // Step 5: Update remittance record
+            return model.remittance.update(
+                { student: `${firstName} ${lastName}`, paid: remittanceRecord.paid + parseFloat(amountPaid), balance: newBalance },
+                { where: { payable: payableId, student: `${firstName} ${lastName}` } }
+            );
+        }
+        console.log("No remittance record found, creating a new one.");
+        // If no remittance record found, create a new one
+        return model.remittance.create({
+            student: `${firstName} ${lastName}`,
+            yearLevel,
+            block,
+            date: new Date(), // Adjust the date accordingly
+            payable: payableId,
+            paid: amountPaid,
+            balance: payableRecord.amount - amountPaid,
+            status: 'Pending', // Adjust status if necessary
+        });
+    })
+    .then(() => {
+        res.status(200).json({ success: true, message: 'Student information, payable, and remittance updated successfully.' });
+    })
+    .catch((error) => {
+        console.error('Error updating student information, payable, or remittance:', error.message);
+        res.status(500).json({ success: false, message: error.message });
+    });
+};
+
+
 
 module.exports = {
     login,
-    Admin_dashboard,
-    Admin_register_user,
     student,
     register_user_by_role,
     Treasurer_create_payable,
@@ -602,5 +638,7 @@ module.exports = {
     treasurer_3A_verify_remittance,
     treasurer_3B_verify_remittance,
     Treasurer_save_fund,
-    updateStudent
+    updateStudent,
+    Admin_dashboard,
+    Admin_register_user
 };
