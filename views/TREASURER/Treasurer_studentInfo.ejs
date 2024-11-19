@@ -9,16 +9,15 @@
 <body>
     <header>
         <div class="logo">
-            <img src="/BSIT_LOGO.png" alt="Logo">
-            <span class="BS">BSIT FUND COLLECTION<br><span class="IT"> MANAGEMENT SYSTEM</span></span>
+            <img src="/BSIT_LOGO.png" alt="BSIT Fund Collection Logo">
+            <span class="BS">BSIT FUND COLLECTION<br><span class="IT">MANAGEMENT SYSTEM</span></span>
         </div>
         <nav class="nav">
             <a href="/Treasurer_dashboard">DASHBOARD</a>
             <a href="/Treasurer_create_payable">PAYABLE</a>
-            
+    
             <div class="dropdown">
                 <a href="#" class="dropbtn" onclick="toggleDropdown('receiveDropdown')">RECEIVE</a>
-                <span class="arrow" onclick="toggleDropdown('receiveDropdown')"></span>
                 <div class="dropdown-content" id="receiveDropdown">
                     <a href="/Treasurer_BSIT_3A_remittance">BSIT-3A</a>
                     <a href="/Treasurer_BSIT_3B_remittance">BSIT-3B</a>
@@ -27,7 +26,6 @@
     
             <div class="dropdown">
                 <a href="#" class="dropbtn" onclick="toggleDropdown('remittanceDropdown')">REMITTANCE</a>
-                <span class="arrow" onclick="toggleDropdown('remittanceDropdown')"></span>
                 <div class="dropdown-content" id="remittanceDropdown">
                     <a href="/Treasurer_3A_verify_remittance">BSIT-3A</a>
                     <a href="/Treasurer_3B_verify_remittance">BSIT-3B</a>
@@ -36,17 +34,17 @@
     
             <div class="dropdown">
                 <a href="#" class="dropbtn" onclick="toggleDropdown('reportDropdown')">REPORT</a>
-                <span class="arrow" onclick="toggleDropdown('reportDropdown')"></span>
                 <div class="dropdown-content" id="reportDropdown">
                     <a href="#">MONTHLY REPORT</a>
                     <a href="#">EXPENSES</a>
                 </div>
             </div>
-            
+    
             <a href="/Treasurer_register_user">REGISTER</a>
             <img src="/user.jpg" alt="User Icon" class="user-icon">
         </nav>
     </header>
+    
     
     <% if (typeof message !== 'undefined') { %>
         <div class="notification" id="notification">
@@ -126,60 +124,84 @@
             <button type="submit" class="Submit" id="receive-button">RECEIVE</button>
         </form>
     </div>
-    
+
 <!-- Modal for editing student info -->
 <div id="edit-modal" class="edit-modal">
     <div class="modal-content">
+        <span class="close" onclick="closeEditModal()">&times;</span> <!-- Close button at the top -->
         <h3>Edit Student Information</h3>
         <form action="/updateStudent" method="POST">
             <!-- Hidden studentId input -->
             <input type="hidden" name="studentId" value="<%= student.userId %>">
         
-            <!-- Fields for student information -->
-            <label for="edit-first-name">First Name:</label>
-            <input type="text" id="edit-first-name" name="firstName" value="<%= student.firstName %>">
+            <!-- Flex container for First Name and Last Name fields -->
+            <div class="name-container">
+                <div class="name-field">
+                    <label for="edit-first-name">First Name:</label>
+                    <input type="text" id="edit-first-name" name="firstName" value="<%= student.firstName %>">
+                </div>
+                <div class="name-field">
+                    <label for="edit-last-name">Last Name:</label>
+                    <input type="text" id="edit-last-name" name="lastName" value="<%= student.lastName %>">
+                </div>
+            </div>
         
-            <label for="edit-last-name">Last Name:</label>
-            <input type="text" id="edit-last-name" name="lastName" value="<%= student.lastName %>">
+            <!-- Flex container for Gender and Year Level fields -->
+            <div class="gender-yearLevel-container">
+                <div class="gender-field">
+                    <label for="edit-gender">Gender:</label>
+                    <select id="edit-gender" name="gender">
+                        <option value="Male" <%= student.gender === 'Male' ? 'selected' : '' %>>MALE</option>
+                        <option value="Female" <%= student.gender === 'Female' ? 'selected' : '' %>>FEMALE</option>
+                    </select>
+                </div>
+
+                <div class="yearLevel-field">
+                    <label for="edit-yearLevel">Year Level:</label>
+                    <select id="edit-yearLevel" name="yearLevel">
+                        <option value="3" <%= student.yearLevel === '3' ? 'selected' : '' %>>3RD YEAR</option>
+                        <option value="4" <%= student.yearLevel === '4' ? 'selected' : '' %>>4TH YEAR</option>
+                    </select>
+                </div>
+            </div>
         
-            <label for="edit-gender">Gender:</label>
-            <select id="edit-gender" name="gender">
-                <option value="Male" <%= student.gender === 'Male' ? 'selected' : '' %>>Male</option>
-                <option value="Female" <%= student.gender === 'Female' ? 'selected' : '' %>>Female</option>
-                <option value="Other" <%= student.gender === 'Other' ? 'selected' : '' %>>Other</option>
-            </select>
+            <div class="form-group">
+                <label for="edit-block">Block:</label>
+                <input type="text" id="edit-block" name="block" value="<%= student.block %>">
+            </div>
         
-            <label for="edit-yearLevel">Year Level:</label>
-            <select id="edit-yearLevel" name="yearLevel">
-                <option value="3" <%= student.yearLevel === '3' ? 'selected' : '' %>>3rd Year</option>
-            </select>
+            <!-- Flex container for Payable and Amount Paid fields -->
+            <div class="payable-amount-container">
+                <div class="payable-field">
+                    <label for="edit-payable">Payable:</label>
+                    <select id="edit-payable" name="payable" onchange="updateAmountAndPaid()">
+                        <% payables.forEach(function(payable) { %>
+                            <option value="<%= payable.id %>" 
+                                    data-amount="<%= payable.amount %>" 
+                                    data-paid="<%= payable.amountPaid || 0 %>"
+                                    <%= student.payable === payable.id ? 'selected' : '' %> >
+                                <%= payable.description %>
+                            </option>
+                        <% }); %>
+                    </select>
+                </div>
+
+                <div class="amount-paid-field">
+                    <label for="edit-amount-paid">Amount Paid:</label>
+                    <input type="number" id="edit-amount-paid" name="amountPaid" value="<%= student.amountPaid %>" readonly>
+                </div>
+            </div>
         
-            <label for="edit-block">Block:</label>
-            <input type="text" id="edit-block" name="block" value="<%= student.block %>">
-        
-            <!-- Payable Dropdown -->
-            <label for="edit-payable">Payable:</label>
-            <select id="edit-payable" name="payable">
-                <% payables.forEach(function(payable) { %>
-                    <option value="<%= payable.id %>" 
-                            data-amount="<%= payable.amount %>" 
-                            data-paid="<%= payable.amountPaid || 0 %>"
-                            <%= student.payable === payable.id ? 'selected' : '' %>>
-                        <%= payable.description %>
-                    </option>
-                <% }); %>
-            </select>
-        
-            <!-- Amount Paid -->
-            <label for="edit-amount-paid">Amount Paid:</label>
-            <input type="number" id="edit-amount-paid" name="amountPaid">
-        
-            <button type="submit">Save Changes</button>
-            <button type="button" class="cancel" onclick="closeEditModal()">Cancel</button>
+            <div class="form-actions">
+                <button type="submit">Save Changes</button>
+            </div>
         </form>
-        
     </div>
 </div>
+
+
+
+
 <script>
     // Function to update the amount paid based on the selected payable
     function updateAmountAndPaid() {

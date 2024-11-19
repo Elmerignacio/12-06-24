@@ -293,25 +293,37 @@ input[type="text"] {
         width: 150px; /* Set a fixed width for the inputs */
     }
 
-    .modal-content {
-        max-width: 600px;
-        margin: auto;
-        padding: 20px;
-        background-color: white;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
+  /* Modal content styling */
+.modal-content {
+    max-width: 600px;
+    margin: auto;
+    padding: 20px;
+    background-color: #d0e8d0;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative; /* Added to position the close button */
+}
 
-    .modal-content h3 {
-        text-align: center;
-    }
+.modal-content h3 {
+    text-align: center;
+}
 
-    .modal-actions {
-        display: flex;
-        justify-content: space-between;
-        padding-top: 10px;
-    }
-  /* Modal styles */
+/* Close button styling */
+.close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 30px;
+    color: #333;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.close:hover {
+    color: #f44336;
+}
+
+/* Modal styles */
 .edit-modal {
     position: fixed;
     top: 0;
@@ -322,17 +334,17 @@ input[type="text"] {
     display: none;
     justify-content: center;
     align-items: center;
-    z-index: 1000; /* Ensures it's above other content */
+    z-index: 1000;
 }
 
 .modal-content {
-    background-color: white;
+    background-color: #d0e8d0;
     padding: 30px;
     border-radius: 8px;
     width: 90%;
-    max-width: 500px; /* Restrict max width */
+    max-width: 500px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    overflow: auto; /* Handle overflow on smaller screens */
+    overflow: auto;
 }
 
 .modal-content h3 {
@@ -357,13 +369,7 @@ input[type="text"] {
     border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 14px;
-    box-sizing: border-box; /* To include padding and border in width */
-}
-
-.modal-content input[type="number"]:focus,
-.modal-content select:focus {
-    border-color: #4CAF50; /* Green focus color */
-    outline: none;
+    box-sizing: border-box;
 }
 
 .modal-content button {
@@ -383,31 +389,11 @@ input[type="text"] {
     background-color: #45a049;
 }
 
-.modal-content button.cancel {
-    background-color: #f44336;
-}
-
-.modal-content button.cancel:hover {
-    background-color: #d32f2f;
-}
-
 .modal-content button:focus {
     outline: none;
 }
 
-.payable-edit {
-    margin-top: 10px;
-}
-
-.payable-edit label {
-    font-size: 13px;
-}
-
-.payable-edit input {
-    width: 80%; /* To prevent wide inputs */
-    margin-left: 10px;
-}
-
+/* Mobile view adjustments */
 @media screen and (max-width: 600px) {
     .modal-content {
         width: 90%;
@@ -421,3 +407,4 @@ input[type="text"] {
         font-size: 14px;
     }
 }
+

@@ -43,11 +43,10 @@ const login_post = async (req, res) => {
  
 };
 const Admin_dashboard = (req, res) => {
-    res.render('Admin_dashboard');
+    res.render('Admin_dashboard'); 
 };
-
 const Admin_register_user = (req, res) => {
-    res.render('Admin_register_user');
+    res.render('Admin_dashboard'); 
 };
 
 
@@ -68,7 +67,7 @@ const register_user_by_role = (req, res) => {
         console.error(message);
         return res.status(status).render("Treasurer_register_user", { message: "Something went wrong, please try again!" });
     };
-
+    
 model.register_user.findOne({ where: { userId: register_post_db.userId } })
         .then(existingUser => {
             if (existingUser) {
@@ -227,7 +226,7 @@ const Display_BSIT_3B = (req, res) => {
             .map(representative => `${representative.firstName} ${representative.lastName}`);
 
         res.render("Treasurer_BSIT_3A_remittance", {
-            blockKey: 'BSIT - 3A',
+            blockKey: 'BSIT - 3B',
             representativeNames,
             filteredUsers,
             payables,
@@ -446,11 +445,14 @@ const treasurer_3A_verify_remittance = (req, res) => {
         const representatives = users.filter(user => user.role === 'REPRESENTATIVE');
         
         console.log("Representatives:", representatives); 
-        
+
+
         const studentRemittances = remittances.map(remittance => {
             const student = users.find(user => user.firstName + ' ' + user.lastName === remittance.student);
             
-            if (student && student.block === 'A') {
+            console.log("Checking Remittance:", remittance);
+
+            if (student && student.block === 'A' && remittance.status.trim().toLowerCase() !== 'received') {  
                 const representative = representatives.find(rep => rep.block === student.block && rep.yearLevel === student.yearLevel);
                 
                 return {
@@ -465,7 +467,7 @@ const treasurer_3A_verify_remittance = (req, res) => {
             }
         }).filter(remittance => remittance);  
 
-        console.log("Student Remittances:", studentRemittances); 
+        console.log("Filtered Student Remittances:", studentRemittances); 
 
         const representativeNames = representatives
             .filter(rep => rep.block === 'A')  
@@ -504,7 +506,8 @@ const treasurer_3B_verify_remittance = (req, res) => {
         const studentRemittances = remittances.map(remittance => {
             const student = users.find(user => user.firstName + ' ' + user.lastName === remittance.student);
             
-            if (student && student.block === 'B') {
+            console.log("Checking Remittance Status:", remittance.status); 
+            if (student && student.block === 'B' && remittance.status.toLowerCase().trim() !== 'received') {
                 const representative = representatives.find(rep => rep.block === student.block && rep.yearLevel === student.yearLevel);
                 
                 return {
@@ -517,9 +520,9 @@ const treasurer_3B_verify_remittance = (req, res) => {
                     status: remittance.status  
                 };
             }
-        }).filter(remittance => remittance);  
+        }).filter(remittance => remittance); 
 
-        console.log("Student Remittances:", studentRemittances); 
+        console.log("Filtered Student Remittances:", studentRemittances);  
 
         const representativeNames = representatives
             .filter(rep => rep.block === 'B')  
@@ -539,19 +542,9 @@ const treasurer_3B_verify_remittance = (req, res) => {
 };
 
 
-const Treasurer_save_fund = (req, res)=> {
-    
-
-    const { yearlevel, block, amount, date } = req.body;
- 
-}
 const updateStudent = (req, res) => {
-    const { studentId, firstName, lastName, gender, yearLevel, block, payable: payableId, amountPaid } = req.body;
+    const { studentId, firstName, lastName, gender, yearLevel, block, payable: payableId,  } = req.body;
 
-    // Check required fields
-    if (!studentId || !payableId || !amountPaid) {
-        return res.status(400).json({ success: false, message: 'Missing required fields.' });
-    }
 
     // Step 1: Update student record in register_user
     model.register_user.update(
@@ -569,48 +562,29 @@ const updateStudent = (req, res) => {
         }
         console.log("Payable record found: ", payableRecord);
 
-        const newPaidAmount = (payableRecord.amountPaid || 0) + parseFloat(amountPaid);
-        const newBalance = (payableRecord.amount || 0) - parseFloat(amountPaid);
-
-        if (newBalance < 0) {
-            throw new Error('Amount paid exceeds the total payable amount.');
-        }
-
         // Step 3: Update payable record
         return model.payable.update(
-            { student: `${firstName} ${lastName}`, amountPaid: newPaidAmount, amount: newBalance }, // Updated student attributes
+            { student: `${firstName} ${lastName}`,yearLevel ,block},
             { where: { id: payableId } }
         );  
     })
     .then(() => {
         console.log("Payable record updated successfully.");
-        // Step 4: Find and update remittance record
-        return model.remittance.findOne({ where: { payable: payableId, student: `${firstName} ${lastName}` } });
+        return model.remittance.findOne({ where: { id: payableId } });
     })
     .then((remittanceRecord) => {
-        if (remittanceRecord) {
-            console.log("Remittance record found: ", remittanceRecord);
-            const newBalance = remittanceRecord.balance - parseFloat(amountPaid);
-
-            // Step 5: Update remittance record
-            return model.remittance.update(
-                { student: `${firstName} ${lastName}`, paid: remittanceRecord.paid + parseFloat(amountPaid), balance: newBalance },
-                { where: { payable: payableId, student: `${firstName} ${lastName}` } }
-            );
+        if (!remittanceRecord) {
+            throw new Error('Payable record not found.');
         }
-        console.log("No remittance record found, creating a new one.");
-        // If no remittance record found, create a new one
-        return model.remittance.create({
-            student: `${firstName} ${lastName}`,
-            yearLevel,
-            block,
-            date: new Date(), // Adjust the date accordingly
-            payable: payableId,
-            paid: amountPaid,
-            balance: payableRecord.amount - amountPaid,
-            status: 'Pending', // Adjust status if necessary
-        });
+        console.log("Payable record found: ", remittanceRecord);
+
+        // Step 3: Update payable record
+        return model.remittance.update(
+            { student: `${firstName} ${lastName}`},
+            { where: { id: payableId } }
+        );  
     })
+       
     .then(() => {
         res.status(200).json({ success: true, message: 'Student information, payable, and remittance updated successfully.' });
     })
@@ -618,6 +592,32 @@ const updateStudent = (req, res) => {
         console.error('Error updating student information, payable, or remittance:', error.message);
         res.status(500).json({ success: false, message: error.message });
     });
+};
+const Treasurer_save_fund = (req, res) => {
+    const { Receive, date } = req.body; 
+    
+    if (Receive && date) {
+
+        model.remittance.update(
+            { 
+                status: 'Received',  
+                date: date         
+            },
+            {
+                where: {
+                    status: 'Pending'  
+                }
+            })
+            .then(() => {
+                res.redirect('/Treasurer_3A_verify_remittance'); 
+            })
+            .catch(err => {
+                console.error(err);
+                res.status(500).send("Error updating the remittance status");
+            });
+    } else {
+        res.status(400).send("Invalid form submission");
+    }
 };
 
 
@@ -639,6 +639,6 @@ module.exports = {
     treasurer_3B_verify_remittance,
     Treasurer_save_fund,
     updateStudent,
-    Admin_dashboard,
-    Admin_register_user
+    Admin_register_user,
+    Admin_dashboard
 };

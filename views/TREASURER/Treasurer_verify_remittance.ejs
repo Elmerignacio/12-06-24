@@ -47,7 +47,6 @@
             <img src="/user.jpg" alt="User Icon" class="user-icon">
         </nav>
     </header>
-    
 
     <div class="container">
         <p><strong><%= blockKey %></strong></p>
@@ -75,7 +74,7 @@
                     <% let totalAmountPaid = 0; %>
                     <% let totalBalance = 0; %>
                     <% studentRemittances.forEach(remittance => { %>
-                        <tr>
+                        <tr data-date="<%= remittance.date %>" data-status="<%= remittance.status %>">
                             <td><%= remittance.date%></td>
                             <td><%= remittance.studentName %></td>
                             <td><%= remittance.payment %></td>
@@ -106,16 +105,17 @@
             </div>
         </div>
     </div>
-
-    <form id="popupForm" class="popup-form" action="Treasurer_save_fund" method="post">
+    <form id="popupForm" class="popup-form" action="/Treasurer_save_fund" method="post" style="display: none;">
         <div class="popup-content">
             <span class="close" onclick="closePopup()">&times;</span>
     
-            <div class="remittance-table">  
+            <div class="remittance-table"> 
                 <h2>REMITTANCE</h2>
-                <span class="span"><%= blockKey %></span>
+                <span class="span"><%= blockKey %></span> <!-- Display blockKey if needed -->
+    
+                <!-- Date input -->
                 <label for="date">Date:</label>
-                <input type="date" id="date">
+                <input type="date" id="date" name="date" onchange="updateCollectedAmount()"> <!-- Add name attribute for form submission -->
     
                 <table>
                     <thead>
@@ -162,96 +162,103 @@
     
                 <p class="Amount">Amount Collected: ₱<span id="collectedAmount">0.00</span></p>
     
-                <p class="Status"><strong>Status:</strong> <span id="status"></span></p>
+                <p class="Status" ><strong>Status:</strong> <span id="status"></span></p>
     
-                <button type="submit" class="receive-btn" >RECEIVE</button>
+                <!-- Hidden input for form submission -->
+                <input type="hidden" name="Receive" value="true">
+    
+                <!-- Disable button initially -->
+                <button type="submit" class="receive-btn" id="receiveButton" disabled>RECEIVE</button>
             </div>
         </div>
-</form>
+    </form>
     
-  
-
+    
+    
+    
     <script>
-    function calculateTotal() {
-        var amountInputs = document.querySelectorAll('.amount-input');
-        var totalAmount = 0;
-
-   
-        amountInputs.forEach(function(input) {
-            var denomination = parseFloat(input.getAttribute('data-denomination'));
-            var amount = parseInt(input.value) || 0; 
-            totalAmount += denomination * amount;
+        function calculateTotal() {
+            var amountInputs = document.querySelectorAll('.amount-input');
+            var totalAmount = 0;
+    
+            // Calculate the total amount from all input fields
+            amountInputs.forEach(function(input) {
+                var denomination = parseFloat(input.getAttribute('data-denomination'));
+                var amount = parseInt(input.value) || 0; 
+                totalAmount += denomination * amount;
+            });
+    
+            // Display the total remitted amount
+            document.getElementById('totalAmount').textContent = totalAmount.toFixed(2); 
+            document.getElementById('collectedAmount').textContent = totalAmount.toFixed(2); 
+    
+            // Call function to check if amounts match
+            checkAmounts();
+        }
+    
+        // Attach event listener to all amount input fields
+        document.querySelectorAll('.amount-input').forEach(function(input) {
+            input.addEventListener('input', calculateTotal);
         });
-
-        document.getElementById('totalAmount').textContent = totalAmount.toFixed(2); 
-        document.getElementById('collectedAmount').textContent = totalAmount.toFixed(2); 
-
-        document.getElementById('status').textContent = "Amount calculated successfully!";
-    }
-
-    document.querySelectorAll('.amount-input').forEach(function(input) {
-        input.addEventListener('input', calculateTotal);
-    });
-
+    
         function toggleDropdown(id) {
             const dropdown = document.getElementById(id);
             dropdown.classList.toggle("show");
         }
+    
         function openPopup() {
             document.getElementById("popupForm").style.display = "flex";
         }
-
+    
         function closePopup() {
             document.getElementById("popupForm").style.display = "none";
         }
-
-        function calculateTotal() {
-            const amountInputs = document.querySelectorAll(".amount-input");
-            let total = 0;
-            amountInputs.forEach(input => {
-                const denomination = parseFloat(input.getAttribute("data-denomination"));
-                const amount = parseFloat(input.value) || 0;
-                total += denomination * amount;
-            });
-
-            document.getElementById("totalAmount").textContent = total.toFixed(2);
-            updateCollectedAmount(); 
-        }
-
+    
         function updateCollectedAmount() {
-    const selectedDate = document.getElementById("date").value;
-    const tableRows = document.querySelectorAll(".scrollable-table-container tbody tr");
-    let collectedAmount = 0;
-    let hasPayables = false; 
-    let statusText = "";
-
-    tableRows.forEach(row => {
-        const rowDate = row.querySelector("td:first-child").textContent.trim();
-        const amountPaid = parseFloat(row.querySelector("td:nth-child(4)").textContent.trim()) || 0;
-        if (rowDate === selectedDate) {
-            collectedAmount += amountPaid;
-            hasPayables = true;  
+            const selectedDate = document.getElementById("date").value;
+            const tableRows = document.querySelectorAll(".scrollable-table-container tbody tr");
+            let collectedAmount = 0;
+            let statusText = "Pending"; // Default to "Pending"
+    
+            // Clear the previous "Amount Collected" value before recalculating
+            document.getElementById("collectedAmount").textContent = "0.00";
+    
+            // Loop through each row and check if the selected date matches
+            tableRows.forEach(row => {
+                const rowDate = row.getAttribute("data-date").trim();
+                const amountPaid = parseFloat(row.querySelector("td:nth-child(4)").textContent.trim()) || 0;
+                const status = row.getAttribute("data-status").trim();
+    
+                if (rowDate === selectedDate) {
+                    collectedAmount += amountPaid; // Add amount if date matches
+                    statusText = status || "Pending"; // Default to "Pending" if no status is found
+                }
+            });
+    
+            // Update the collected amount and status display
+            document.getElementById("collectedAmount").textContent = collectedAmount.toFixed(2);
+            document.getElementById("status").textContent = statusText;
+    
+            // Call function to check if amounts match
+            checkAmounts();
         }
-    });
-
-    if (hasPayables) {
-        document.getElementById("collectedAmount").textContent = `${collectedAmount.toFixed(2)}`;
-        statusText = "Pending"; 
-        document.querySelector(".scrollable-table-container table").style.pointerEvents = "auto";
-    } else {
-        document.getElementById("collectedAmount").textContent = "0.00";
-        statusText = "No payables"; 
-        document.querySelector(".scrollable-table-container table").style.pointerEvents = "none";
-    }
-
-    const statusElement = document.getElementById("status");
-    if (statusElement) {
-        statusElement.textContent = statusText;
-    }
-}
-
-
-        document.getElementById("date").addEventListener("change", updateCollectedAmount);
+    
+        // Function to check if "Amount Collected" matches "Total Amount Remitted"
+        function checkAmounts() {
+            const collectedAmount = parseFloat(document.getElementById("collectedAmount").textContent.trim());
+            const totalAmount = parseFloat(document.getElementById("totalAmount").textContent.trim());
+    
+            const receiveButton = document.getElementById("receiveButton");
+    
+            // Enable the button only if the amounts match
+            if (collectedAmount === totalAmount) {
+                receiveButton.disabled = false;
+            } else {
+                receiveButton.disabled = true;
+            }
+        }
     </script>
+    
+    
 </body>
 </html>

@@ -1,5 +1,5 @@
 const express = require('express');
-const route = require('./routes/admin.route.js')
+const route = require('./routes/Treasuser.route.js')
 const path = require('path');
 require ("dotenv").config()
 const session = require('express-session');
