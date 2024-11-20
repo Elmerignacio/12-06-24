@@ -5,8 +5,9 @@ const model = require('../models/index.js')
 const   Treasurer_controller = require('../Constroller/Treasurer_controller.js');
 
 
-Treasurer_route.get('/Admin_dashboard',middleware.authenticateJWT, Treasurer_controller.Admin_dashboard)
-Treasurer_route.get('/Admin_register_user',middleware.authenticateJWT, Treasurer_controller.Admin_register_user)
+
+Treasurer_route.get('/login', Treasurer_controller.login)
+Treasurer_route.post('/login',Treasurer_controller.login_post);
 
 Treasurer_route.post('/register_user_by_role',middleware.authenticateJWT, Treasurer_controller.register_user_by_role)
 
@@ -31,6 +32,14 @@ Treasurer_route.post('/Treasurer_save_fund',middleware.authenticateJWT,Treasurer
 Treasurer_route.post('/updateStudent',middleware.authenticateJWT,Treasurer_controller.updateStudent)
 
 Treasurer_route.post('/Treasurer_save_fund',middleware.authenticateJWT,Treasurer_controller.updateStudent)
+
+//admin
+Treasurer_route.get('/Admin_dashboard',middleware.authenticateJWT, Treasurer_controller.Admin_dashboard)
+Treasurer_route.get('/Admin_register_user',middleware.authenticateJWT, Treasurer_controller.Admin_register_user)
+Treasurer_route.get('/Admin_3A_verify_remittance',middleware.authenticateJWT, Treasurer_controller.Admin_3A_verify_remittance)
+Treasurer_route.get('/Admin_3B_verify_remittance',middleware.authenticateJWT, Treasurer_controller.Admin_3B_verify_remittance)
+Treasurer_route.get('/Admin_register_user',middleware.authenticateJWT, Treasurer_controller.Admin_register_user)
+
 
 
 

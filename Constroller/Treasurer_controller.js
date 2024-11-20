@@ -6,50 +6,49 @@ require ("dotenv").config()
 
 const login = (req, res) => {
     res.render('login'); 
-
 };
 const login_post = async (req, res) => {
-    const {username, password} = req.body;
+    const { username, password } = req.body;
 
     try {
-        const user = await model.register_user.findOne({where: {userName:username}});
-        if (!user) return res.status(400).redirect ("login")
+        const user = await model.register_user.findOne({ where: { userName: username } });
+        if (!user) return res.status(400).redirect("login");
 
         const passwordMatch = await bcrypt.compare(password, user.password);
-        if (!passwordMatch)return res.status(400).redirect ("login")
+        if (!passwordMatch) return res.status(400).redirect("login");
 
         const outTokenValue = jwt.sign({
             exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24),
             role: user.role,
-            userid:user.id,
+            userid: user.id,
             firstname: user.firstName,
             lastname: user.lastName,
-             }, process.env.JWT_SECRET,)
+        }, process.env.JWT_SECRET);
 
-             res.cookie("funds", outTokenValue,{
-                httpOnly:true,
-                secure:true,
-                sameSite:"strict",
-                maxAge:1000*60*60*24    
+        res.cookie("funds", outTokenValue, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "strict",
+            maxAge: 1000 * 60 * 60 * 24
+        });
 
-             });
+        switch (user.role) {
+            case 'ADMIN':
+                return res.redirect('/Admin_dashboard');
+            case 'TREASURER':
+                return res.redirect('/Treasurer_dashboard');
+            case 'student':
+                return res.redirect('/Student_dashboard');
+            default:
+                console.log('Unknown role');
+                return res.status(400).redirect("login");
+        }
 
-             return res.redirect("Treasurer_dashboard")
-                
     } catch (error) {
         console.log(error);
-        
+        return res.status(500).redirect("login");
     }
- 
 };
-const Admin_dashboard = (req, res) => {
-    res.render('Admin_dashboard'); 
-};
-const Admin_register_user = (req, res) => {
-    res.render('Admin_dashboard'); 
-};
-
-
 const register_user_by_role = (req, res) => {
     const register_post_db = {
         userId: req.body.userId,
@@ -65,16 +64,18 @@ const register_user_by_role = (req, res) => {
 
     const handleError = (message, status = 500) => {
         console.error(message);
-        return res.status(status).render("Treasurer_register_user", { message: "Something went wrong, please try again!" });
+        return res.status(status).render("Treasurer_register_user", { 
+            message: { text: "Something went wrong, please try again!", type: 'error' }
+        });
     };
     
-model.register_user.findOne({ where: { userId: register_post_db.userId } })
+    model.register_user.findOne({ where: { userId: register_post_db.userId } })
         .then(existingUser => {
             if (existingUser) {
                 return res.status(400).render("Treasurer_register_user", {
-                    message: "User ID already exists. Please use a different ID.",
+                    message: { text: "User ID already exists. Please use a different ID.", type: 'error' }
                 });
-            }
+            }   
 
             return model.register_user.findOne({
                 where: {
@@ -86,41 +87,49 @@ model.register_user.findOne({ where: { userId: register_post_db.userId } })
             }).then(existingNameUser => {
                 if (existingNameUser) {
                     return res.status(400).render("Treasurer_register_user", {
-                        message: `A user with the name ${register_post_db.firstName} ${register_post_db.lastName} already exists in Year ${register_post_db.yearLevel} and Block ${register_post_db.block}.`
+                        message: { 
+                            text: `A user with the name ${register_post_db.firstName} ${register_post_db.lastName} already exists in Year ${register_post_db.yearLevel} and Block ${register_post_db.block}.`, 
+                            type: 'error' 
+                        }
                     });
                 }
 
-                if (register_post_db.role === "representative") {
+                if (register_post_db.role === "REPRESENTATIVE") {
                     return model.register_user.findOne({
                         where: {
                             yearLevel: register_post_db.yearLevel,
                             block: register_post_db.block,
-                            role: "representative"
+                            role: "REPRESENTATIVE"
                         }
                     })
                     .then(existingRepresentative => {
                         if (existingRepresentative) {
                             return res.status(400).render("Treasurer_register_user", {
-                                message: `A representative for Year ${register_post_db.yearLevel} and Block ${register_post_db.block} already exists.`
+                                message: { 
+                                    text: `A representative for Year ${register_post_db.yearLevel} and Block ${register_post_db.block} already exists.`, 
+                                    type: 'error' 
+                                }
                             });
                         }
                         return createUser(register_post_db, res);
                     })
                     .catch(() => handleError("Representative Check Error:"));
                 }
-
-                if (register_post_db.role === "treasurer") {
+                
+                if (register_post_db.role === "TREASURER") {
                     return model.register_user.findOne({
                         where: {
                             yearLevel: register_post_db.yearLevel,
-                            block: register_post_db.block,
-                            role: "treasurer"
+                            role: "TREASURER"
                         }
                     })
                     .then(existingTreasurer => {
                         if (existingTreasurer) {
                             return res.status(400).render("Treasurer_register_user", {
-                                message: `A treasurer for Year ${register_post_db.yearLevel} and Block ${register_post_db.block} already exists. Only one treasurer is allowed per block.`
+                                message: { 
+                                    text: `A treasurer already exists, only 1 treasurer user allowed on this system`, 
+                                    type: 'error' 
+                                }
                             });
                         }
                         return createUser(register_post_db, res);
@@ -139,10 +148,11 @@ const createUser = (register_post_db, res) => {
         bcrypt.hash(register_post_db.password, 10, (err, hashedPassword) => {
             if (err) {
                 console.error("Error hashing password:", err);
-                return res.status(500).render("Treasurer_register_user", { message: "Something went wrong while hashing the password!" });
+                return res.status(500).render("Treasurer_register_user", { 
+                    message: { text: "Something went wrong while hashing the password!", type: 'error' }
+                });
             }
             register_post_db.password = hashedPassword;
-
             saveUser(register_post_db, res);
         });
     } else {
@@ -153,19 +163,38 @@ const createUser = (register_post_db, res) => {
 const saveUser = (register_post_db, res) => {
     model.register_user.create(register_post_db)
         .then(() => {
-            res.status(200).render("Treasurer_register_user", { message: "Registration successful!" });
+            res.status(200).render("Treasurer_register_user", { 
+                message: { text: "Registration successful!", type: 'success' }
+            });
         })
         .catch(error => {
             console.error("Database Insert Error:", error);
-            res.status(500).render("Treasurer_register_user", { message: "Something went wrong, please try again!" });
+            res.status(500).render("Treasurer_register_user", { 
+                message: { text: "Something went wrong, please try again!", type: 'error' }
+            });
         });
 };
 
 
 const Treasurer_dashboard = (req, res) => {
-    res.render('Treasurer_dashboard');
-};
-
+    model.register_user.findOne({
+        where: {
+            role: 'Treasurer' 
+        }
+    })
+    .then(user => {
+        if (user) {
+            const treasurerName = user.firstName + ' ' + user.lastName; 
+            res.render('Treasurer_dashboard', { treasurerName });
+        } else {
+            res.render('Treasurer_dashboard', { treasurerName: 'No treasurer found' });
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        res.render('Treasurer_dashboard', { treasurerName: 'Error retrieving name' });
+    });
+}
 
 const Treasurer_create_payable = (req, res) => {
     res.render('Treasurer_create_payable');
@@ -184,7 +213,7 @@ const Display_BSIT_3A = (req, res) => {
     ])
     .then(([users, payables, remittances]) => {  
         const filteredUsers = users.filter(user =>
-            ['STUDENT', 'REPRESENTATIVE'].includes(user.role) &&
+            ['STUDENT', 'REPRESENTATIVE', 'TREASURER'].includes(user.role) &&
             user.yearLevel === '3' &&
             user.block === 'A'
         );
@@ -216,7 +245,7 @@ const Display_BSIT_3B = (req, res) => {
     ])
     .then(([users, payables, remittances]) => {  
         const filteredUsers = users.filter(user =>
-            ['STUDENT', 'REPRESENTATIVE'].includes(user.role) &&
+            ['STUDENT', 'REPRESENTATIVE','TREASURER'].includes(user.role) &&
             user.yearLevel === '3' &&
             user.block === 'B'
         );
@@ -257,18 +286,19 @@ const student = (req, res) => {
         res.status(500).json({ error: 'Unable to fetch students.' });
     });
 }; 
- 
+
 const create_payable = (req, res) => {
     const { yearLevel, block, student, description, amount } = req.body;
 
     let searchCondition = {
         yearLevel: yearLevel,
         block: block,
-        role: ['student', 'representative']
+        role: ['STUDENT', 'REPRESENTATIVE', 'TREASURER'],
     };
 
     if (student !== "all") {
         const nameParts = student.trim().split(' ');
+
         searchCondition = {
             ...searchCondition,
             [Op.or]: [
@@ -281,29 +311,59 @@ const create_payable = (req, res) => {
     model.register_user.findAll({ where: searchCondition })
         .then(students => {
             if (students.length === 0) {
-                return res.status(404).render("error", { message: "No students found for the selected year, block, or name." });
+                return res.status(404).render("Treasurer_create_payable", { 
+                    message: "No students found for the selected year, block, or name.",
+                    messageType: 'error'
+                });
             }
 
-            const payables = students.map(student => ({
+            const checkPromises = students.map(student =>
+                model.payable.findOne({
+                    where: {
+                        student: `${student.firstName} ${student.lastName}`.toUpperCase(),
+                        description: description.toUpperCase()
+                    }
+                }).then(existingPayable => {
+                    if (existingPayable) {
+                        throw new Error(`Payable already exists for student ${student.firstName} ${student.lastName}`);
+                    }
+                    return student;
+                })
+            );
+
+            return Promise.all(checkPromises);
+        })
+        .then(validStudents => {
+            const payables = validStudents.map(student => ({
                 yearLevel: yearLevel,
                 block: block,
-                student: `${student.firstName} ${student.lastName}`,
-                description: description,
+                student: `${student.firstName} ${student.lastName}`.toUpperCase(),
+                description: description.toUpperCase(),
                 amount: amount,
             }));
 
             return model.payable.bulkCreate(payables);
         })
         .then(() => {
-            res.status(200).render("Treasurer_create_payable", { message: "Payables successfully created!" });
+            res.status(200).render("Treasurer_create_payable", { 
+                message: "Payables successfully created!",
+                messageType: 'success' 
+            });
         })
         .catch(error => {
             console.error(error);
-            res.status(500).render("error", { message: "Unable to create payables." });
+            if (error.message.includes("Payable already exists")) {
+                return res.status(400).render("Treasurer_create_payable", { 
+                    message: error.message,
+                    messageType: 'error' 
+                });
+            }
+            res.status(500).render("error", { 
+                message: "Unable to create payables.",
+                messageType: 'error' 
+            });
         });
 };
-
-
 
 const Display_Student_Info = (req, res) => {
     const userId = req.params.userId;
@@ -545,15 +605,12 @@ const treasurer_3B_verify_remittance = (req, res) => {
 const updateStudent = (req, res) => {
     const { studentId, firstName, lastName, gender, yearLevel, block, payable: payableId,  } = req.body;
 
-
-    // Step 1: Update student record in register_user
     model.register_user.update(
         { firstName, lastName, gender, yearLevel, block },
         { where: { userId: studentId } }
     )
     .then(() => {
         console.log("Student record updated successfully.");
-        // Step 2: Find and update payable record
         return model.payable.findOne({ where: { id: payableId } });
     })
     .then((payableRecord) => {
@@ -562,7 +619,6 @@ const updateStudent = (req, res) => {
         }
         console.log("Payable record found: ", payableRecord);
 
-        // Step 3: Update payable record
         return model.payable.update(
             { student: `${firstName} ${lastName}`,yearLevel ,block},
             { where: { id: payableId } }
@@ -578,7 +634,6 @@ const updateStudent = (req, res) => {
         }
         console.log("Payable record found: ", remittanceRecord);
 
-        // Step 3: Update payable record
         return model.remittance.update(
             { student: `${firstName} ${lastName}`},
             { where: { id: payableId } }
@@ -593,6 +648,7 @@ const updateStudent = (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     });
 };
+
 const Treasurer_save_fund = (req, res) => {
     const { Receive, date } = req.body; 
     
@@ -620,6 +676,145 @@ const Treasurer_save_fund = (req, res) => {
     }
 };
 
+//admin
+
+const Admin_dashboard = (req, res) => {
+    model.register_user.findOne({
+        where: {
+            role: 'Admin' 
+        }
+    })
+    .then(user => {
+        if (user) {
+            const treasurerName = user.firstName + ' ' + user.lastName; 
+            res.render('Admin_dashboard', { treasurerName });
+        } else {
+            res.render('Admin_dashboard', { treasurerName: 'No admin found' });
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        res.render('Admin_dashboard', { treasurerName: 'Error retrieving name' });
+    });
+}
+
+const Admin_register_user = (req, res) => {
+    res.render('Admin_register_user'); 
+};
+
+const Admin_3A_verify_remittance = (req, res) => {
+    const selectedDate = req.query.date || ''; 
+
+    Promise.all([ 
+        model.register_user.findAll(), 
+        model.remittance.findAll() 
+    ])
+    .then(([users, remittances]) => {  
+        const filteredStudents = users.filter(user =>
+            user.role === 'STUDENT' &&
+            user.yearLevel === '3' &&
+            user.block === 'A' 
+        );
+
+        const representatives = users.filter(user => user.role === 'REPRESENTATIVE');
+        
+        console.log("Representatives:", representatives); 
+
+
+        const studentRemittances = remittances.map(remittance => {
+            const student = users.find(user => user.firstName + ' ' + user.lastName === remittance.student);
+            
+            console.log("Checking Remittance:", remittance);
+
+            if (student && student.block === 'A' && remittance.status.trim().toLowerCase() !== 'received') {  
+                const representative = representatives.find(rep => rep.block === student.block && rep.yearLevel === student.yearLevel);
+                
+                return {
+                    studentName: remittance.student,
+                    payment: remittance.payable,
+                    amountPaid: remittance.paid,
+                    date: remittance.date,
+                    block: student.block,
+                    representativeName: representative ? `${representative.firstName} ${representative.lastName}` : 'N/A',
+                    status: remittance.status  
+                };
+            }
+        }).filter(remittance => remittance);  
+
+        console.log("Filtered Student Remittances:", studentRemittances); 
+
+        const representativeNames = representatives
+            .filter(rep => rep.block === 'A')  
+            .map(representative => `${representative.firstName} ${representative.lastName}`);
+
+        res.render("Treasurer_verify_remittance", {
+            blockKey: 'BSIT - 3A',
+            studentRemittances,
+            representativeNames,
+            filteredStudents,
+            selectedDate, 
+        });
+    })
+    .catch(error => {
+        console.error(error);
+        res.status(500).render("error", { message: "Unable to retrieve data" });
+    });
+};
+
+const Admin_3B_verify_remittance = (req, res) => {
+    Promise.all([ 
+        model.register_user.findAll(), 
+        model.remittance.findAll() 
+    ])
+    .then(([users, remittances]) => {  
+        const filteredStudents = users.filter(user =>
+            user.role === 'STUDENT' &&
+            user.yearLevel === '3' &&
+            user.block === 'B' 
+        );
+
+        const representatives = users.filter(user => user.role === 'REPRESENTATIVE');
+        
+        console.log("Representatives:", representatives); 
+        
+        const studentRemittances = remittances.map(remittance => {
+            const student = users.find(user => user.firstName + ' ' + user.lastName === remittance.student);
+            
+            console.log("Checking Remittance Status:", remittance.status); 
+            if (student && student.block === 'B' && remittance.status.toLowerCase().trim() !== 'received') {
+                const representative = representatives.find(rep => rep.block === student.block && rep.yearLevel === student.yearLevel);
+                
+                return {
+                    studentName: remittance.student,
+                    payment: remittance.payable,
+                    amountPaid: remittance.paid,
+                    date: remittance.date,
+                    block: student.block,
+                    representativeName: representative ? `${representative.firstName} ${representative.lastName}` : 'N/A',
+                    status: remittance.status  
+                };
+            }
+        }).filter(remittance => remittance); 
+
+        console.log("Filtered Student Remittances:", studentRemittances);  
+
+        const representativeNames = representatives
+            .filter(rep => rep.block === 'B')  
+            .map(representative => `${representative.firstName} ${representative.lastName}`);
+
+        res.render("Treasurer_verify_remittance", {
+            blockKey: 'BSIT - 3B',
+            studentRemittances,
+            representativeNames,
+            filteredStudents,
+        });
+    })
+    .catch(error => {
+        console.error(error);
+        res.status(500).render("error", { message: "Unable to retrieve data" });
+    });
+};
+
 
 
 module.exports = {
@@ -639,6 +834,12 @@ module.exports = {
     treasurer_3B_verify_remittance,
     Treasurer_save_fund,
     updateStudent,
+
+///admin
     Admin_register_user,
-    Admin_dashboard
+    Admin_dashboard,
+    Admin_3A_verify_remittance,
+    Admin_3B_verify_remittance,
+ 
+  
 };

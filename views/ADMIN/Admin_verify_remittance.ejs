@@ -14,24 +14,16 @@
             <span class="BS">BSIT FUND COLLECTION<br><span class="IT"> MANAGEMENT SYSTEM</span></span>
         </div>
         <nav class="nav">
-            <a href="Treasurer_dashboard" class="nav-link" id="dashboardLink">DASHBOARD</a>
-            <a href="Treasurer_create_payable" class="nav-link" id="payableLink">PAYABLE</a>
+            <a href="Admin_dashboard" class="nav-link" id="dashboardLink">DASHBOARD</a>
+
             
-            <div class="dropdown">
-              <a href="#" class="dropbtn nav-link" id="receiveLink" onclick="toggleDropdown('receiveDropdown')">RECEIVE</a>
-              <span class="arrow" onclick="toggleDropdown('receiveDropdown')"></span>
-              <div class="dropdown-content" id="receiveDropdown">
-                <a href="Treasurer_BSIT_3A_remittance">BSIT-3A</a>
-                <a href="Treasurer_BSIT_3B_remittance">BSIT-3B</a>
-              </div>
-            </div>
           
             <div class="dropdown">
               <a href="#" class="dropbtn nav-link" id="remittanceLink" onclick="toggleDropdown('remittanceDropdown')">REMITTANCE</a>
               <span class="arrow" onclick="toggleDropdown('remittanceDropdown')"></span>
               <div class="dropdown-content" id="remittanceDropdown">
-                <a href="Treasurer_3A_verify_remittance">BSIT-3A</a>
-                <a href="treasurer_3B_verify_remittance">BSIT-3B</a>
+                <a href="#">BSIT-3A</a>
+                <a href="#">BSIT-3B</a>
               </div>
             </div>
           
@@ -43,8 +35,8 @@
                 <a href="#">EXPENSES</a>
               </div>
             </div>
-            <a href="Treasurer_register_user" class="nav-link" id="registerLink">REGISTER</a>
-            
+            <a href="Admin_register_user" class="nav-link" id="registerLink">REGISTER</a>
+           
             <div class="dropdown">
               <a href="#" class="dropbtn nav-link" id="reportLink" onclick="toggleDropdown('userDropdown')"><i class="fa-solid fa-user"></i></a>
               <span class="arrow" onclick="toggleDropdown('userDropdown')"></span>
@@ -55,6 +47,7 @@
               </div>
         </nav>
     </header>
+    
 
     <div class="container">
         <p><strong><%= blockKey %></strong></p>

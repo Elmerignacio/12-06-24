@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Treasurer Remittance</title>
-    <link rel="stylesheet" href="/TREASURER_CSS/Treasurer_remmitance.css">        
+    <link rel="stylesheet" href="/TREASURER_CSS/Treasurer_remmitance.css">  
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css">      
 </head>
 
 <body>
@@ -14,38 +15,45 @@
             <span class="BS">BSIT FUND COLLECTION<br><span class="IT"> MANAGEMENT SYSTEM</span></span>
         </div>
         <nav class="nav">
-            <a href="/Treasurer_dashboard">DASHBOARD</a>
-            <a href="/Treasurer_create_payable">PAYABLE</a>
+            <a href="Treasurer_dashboard" class="nav-link" id="dashboardLink">DASHBOARD</a>
+            <a href="Treasurer_create_payable" class="nav-link" id="payableLink">PAYABLE</a>
             
             <div class="dropdown">
-                <a href="#" class="dropbtn" onclick="toggleDropdown('receiveDropdown')">RECEIVE</a>
-                <span class="arrow" onclick="toggleDropdown('receiveDropdown')"></span>
-                <div class="dropdown-content" id="receiveDropdown">
-                    <a href="/Treasurer_BSIT_3A_remittance">BSIT-3A</a>
-                    <a href="/Treasurer_BSIT_3B_remittance">BSIT-3B</a>
-                </div>
+              <a href="#" class="dropbtn nav-link" id="receiveLink" onclick="toggleDropdown('receiveDropdown')">RECEIVE</a>
+              <span class="arrow" onclick="toggleDropdown('receiveDropdown')"></span>
+              <div class="dropdown-content" id="receiveDropdown">
+                <a href="Treasurer_BSIT_3A_remittance">BSIT-3A</a>
+                <a href="Treasurer_BSIT_3B_remittance">BSIT-3B</a>
+              </div>
             </div>
-    
+          
             <div class="dropdown">
-                <a href="#" class="dropbtn" onclick="toggleDropdown('remittanceDropdown')">REMITTANCE</a>
-                <span class="arrow" onclick="toggleDropdown('remittanceDropdown')"></span>
-                <div class="dropdown-content" id="remittanceDropdown">
-                    <a href="/Treasurer_3A_verify_remittance">BSIT-3A</a>
-                    <a href="/Treasurer_3B_verify_remittance">BSIT-3B</a>
-                </div>
+              <a href="#" class="dropbtn nav-link" id="remittanceLink" onclick="toggleDropdown('remittanceDropdown')">REMITTANCE</a>
+              <span class="arrow" onclick="toggleDropdown('remittanceDropdown')"></span>
+              <div class="dropdown-content" id="remittanceDropdown">
+                <a href="Treasurer_3A_verify_remittance">BSIT-3A</a>
+                <a href="treasurer_3B_verify_remittance">BSIT-3B</a>
+              </div>
             </div>
-    
+          
             <div class="dropdown">
-                <a href="#" class="dropbtn" onclick="toggleDropdown('reportDropdown')">REPORT</a>
-                <span class="arrow" onclick="toggleDropdown('reportDropdown')"></span>
-                <div class="dropdown-content" id="reportDropdown">
-                    <a href="#">MONTHLY REPORT</a>
-                    <a href="#">EXPENSES</a>
-                </div>
+              <a href="#" class="dropbtn nav-link" id="reportLink" onclick="toggleDropdown('reportDropdown')">REPORT</a>
+              <span class="arrow" onclick="toggleDropdown('reportDropdown')"></span>
+              <div class="dropdown-content" id="reportDropdown">
+                <a href="#">MONTHLY REPORT</a>
+                <a href="#">EXPENSES</a>
+              </div>
             </div>
+            <a href="Treasurer_register_user" class="nav-link" id="registerLink">REGISTER</a>
             
-            <a href="/Treasurer_register_user">REGISTER</a>
-            <img src="/user.jpg" alt="User Icon" class="user-icon">
+            <div class="dropdown">
+              <a href="#" class="dropbtn nav-link" id="reportLink" onclick="toggleDropdown('userDropdown')"><i class="fa-solid fa-user"></i></a>
+              <span class="arrow" onclick="toggleDropdown('userDropdown')"></span>
+              <div class="dropdown-content" id="userDropdown">
+                  <a href="#">MANAGE ACCOUNT</a>
+                  <a href="Login">LOGOUT</a>
+              </div>
+              </div>
         </nav>
     </header>
     
@@ -77,10 +85,9 @@
                             let userTotalBalance = 0;
                             let payableDescriptions = userPayables.map(p => p.description).join(', ');
     
-                            // Find the remittance for the user
                             const userRemittance = remittances.filter(rem => rem.student === `${user.firstName} ${user.lastName}`);
                             
-                            console.log('User Remittance:', userRemittance); // Debugging line to check remittances
+                            console.log('User Remittance:', userRemittance); 
                         %>
                         
                         <tr>
@@ -100,7 +107,7 @@
                                 <% 
                                     let totalPaidForUser = userRemittance.reduce((total, rem) => total + (rem.paid || 0), 0);
                                     if (userPayables.length === 0) {
-                                        totalPaidForUser = 0; // Default for users with no payables
+                                        totalPaidForUser = 0; 
                                     }
                                 %>
                                 <%= totalPaidForUser || 0 %> 
@@ -108,7 +115,7 @@
                             <td>
                                 <% 
                                     if (userPayables.length === 0) {
-                                        userTotalBalance = 0; // Default balance if no payables
+                                        userTotalBalance = 0; 
                                     } else {
                                         userPayables.forEach(payable => {
                                             userTotalPaid += payable.amountPaid || 0;
@@ -131,7 +138,7 @@
                         <td></td>
                         <td>
                             <%= Math.floor(payables.reduce((total, payable) => total + (payable.amountPaid || 0), 0)) %>
-                        </td> 
+                        </td>
                         <td><%= totalBalance || 0 %></td>
                     </tr>
                 </tfoot>
@@ -139,7 +146,7 @@
         </div>
     </div>
     
-    <script src="/TREASURER_JS/Treasurer_BSIT_3A_remittance.js"></script>
+    <script src="/TREASURER_JS/Treasurer_BSIT_3A_remittance.js"> </script>
 </body>
 </html>
      

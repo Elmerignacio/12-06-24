@@ -1,175 +1,121 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BSIT Fund Collection Management System</title>
-  <link rel="stylesheet" href="ADMIN/Admin_register_user.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BSIT Fund Collection Management System</title>
+    <link rel="stylesheet" href="TREASURER_CSS/Treasurer_register_user.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css">  
+
 </head>
+<style>
+         .notification {
+        padding: 15px;
+        margin: 19px;
+        border-radius: 5px;
+        text-align: center;
+}
+
+.success {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.error {
+    background-color: #f44336; 
+    color: white;
+}
+
+
+</style>
 <body>
-  <header>
-    <div class="logo">
-        <img src="/BSIT_LOGO.png" alt="Logo">
-        <span class="BS">BSIT FUND COLLECTION<br><span class="IT"> MANAGEMENT SYSTEM</span></span>
-    </div>
-    <nav class="nav">
-        <a href="Admin_dashboard">DASHBOARD</a>
-        <div class="dropdown">
-            <a href="#" class="dropbtn" onclick="toggleDropdown('remittanceDropdown')">REMITTANCE</a>
+    <header>
+        <div class="logo">
+            <img src="/BSIT_LOGO.png" alt="Logo">
+            <span class="BS">BSIT FUND COLLECTION<br><span class="IT"> MANAGEMENT SYSTEM</span></span>
+        </div>
+        <nav class="nav">
+            <a href="Admin_dashboard" class="nav-link" id="dashboardLink">DASHBOARD</a>
+          
+            <div class="dropdown">
+            <a href="#" class="dropbtn nav-link" id="remittanceLink" onclick="toggleDropdown('remittanceDropdown')">REMITTANCE</a>
             <span class="arrow" onclick="toggleDropdown('remittanceDropdown')"></span>
             <div class="dropdown-content" id="remittanceDropdown">
-                <a href="#">BSIT-3A</a>
-                <a href="#">BSIT-3B</a>
+                <a href="Admin_3A_verify_remittance">BSIT-3A</a>
+                <a href="Admin_3B_verify_remittance">BSIT-3B</a>
             </div>
-        </div>
-        <div class="dropdown">
-            <a href="#" class="dropbtn" onclick="toggleDropdown('reportDropdown')">REPORT</a>
+            </div>
+        
+            <div class="dropdown">
+            <a href="#" class="dropbtn nav-link" id="reportLink" onclick="toggleDropdown('reportDropdown')">REPORT</a>
             <span class="arrow" onclick="toggleDropdown('reportDropdown')"></span>
             <div class="dropdown-content" id="reportDropdown">
                 <a href="#">MONTHLY REPORT</a>
                 <a href="#">EXPENSES</a>
             </div>
+            </div>
+            <a href="Admin_register_user" class="nav-link" id="registerLink">REGISTER</a>
+
+            <div class="dropdown">
+                <a href="#" class="dropbtn nav-link" id="reportLink" onclick="toggleDropdown('userDropdown')"><i class="fa-solid fa-user"></i></a>
+                <span class="arrow" onclick="toggleDropdown('userDropdown')"></span>
+                <div class="dropdown-content" id="userDropdown">
+                    <a href="#">MANAGE ACCOUNT</a>
+                    <a href="Login">LOGOUT</a>
+                </div>
+                </div>
+        </nav>
+    </header>
+
+    <% if (typeof message !== 'undefined') { %>
+        <div class="notification <%= message.type === 'success' ? 'success' : 'error' %>" id="notification">
+            <p><%= message.text %></p>
         </div>
-        <a href="Admin_register_user">REGISTER</a>
-        <img src="/user.jpg" alt="User Icon" class="user-icon">
-    </nav>
-</header>
+    <% } %>
+    
 
-<div class="register-form-container">
-  <form method="post" action="register_user_by_role" class="register-form">
-    <h2 class="register">Register</h2>
-  
-    <input name="userId" type="integer" placeholder="ID NUMBER" required>
-    <input name="lastName" type="text" placeholder="LASTNAME" required>
-    <input name="firstName" type="text" placeholder="FIRSTNAME" required>
-  
-    <div class="select-group">
-      <select name="yearLevel" required>
-        <option value="" disabled selected>YEAR LEVEL</option>
-        <option value="1">1st Year</option>
-        <option value="2">2nd Year</option>
-        <option value="3">3rd Year</option>
-        <option value="4">4th Year</option>
-      </select>
-      <select name="block" required>
-        <option value="" disabled selected>BLOCK</option>
-        <option value="A">Block A</option>
-        <option value="B">Block B</option>
-      </select>
+
+    <div class="register-form-container">
+        <form method="post" action="register_user_by_role" class="register-form">
+            <h2 class="register">Register</h2>
+
+            <input name="userId" type="integer" placeholder="ID NUMBER" required>
+            <input name="lastName" type="text" placeholder="LASTNAME" required>
+            <input name="firstName" type="text" placeholder="FIRSTNAME" required>
+
+            <div class="select-group">
+                <select name="yearLevel" required>
+                    <option value="" disabled selected>YEAR LEVEL</option>
+                    <option value="3">3RD YEAR</option>
+                </select>
+                <select name="block" required>
+                    <option value="" disabled selected>BLOCK</option>
+                    <option value="A">Block A</option>
+                    <option value="B">Block B</option>
+                </select>
+            </div>
+
+            <div class="gender">
+                <label>GENDER:</label>
+                <label><input type="radio" name="gender" value="male" required> MALE</label>
+                <label><input type="radio" name="gender" value="female" required> FEMALE</label>
+            </div>
+
+            <select name="role" id="role" required onchange="toggleAccess()">
+                <option value="" disabled selected>ROLE</option>
+                <option value="admin">ADMIN</option>
+                <option value="treasurer">TREASURER</option>
+                <option value="representative">REPRESENTATIVE</option>
+                <option value="student">STUDENT</option>
+            </select>
+
+            <input name="userName" type="text" id="username" placeholder="USERNAME" readonly required>
+            <input name="password" type="text" id="password" placeholder="PASSWORD" required>
+
+            <button type="submit">Register User</button>
+        </form>
     </div>
-  
-    <div class="gender">
-      <label>GENDER:</label>
-      <label><input type="radio" name="gender" value="male" required> MALE</label>
-      <label><input type="radio" name="gender" value="female" required> FEMALE</label>
-    </div>
-  
-    <select name="role" id="role" required onchange="toggleAccess()">
-      <option value="" disabled selected>ROLE</option>
-      <option value="admin">Admin</option>
-      <option value="treasurer">Treasurer</option>
-      <option value="representative">Representative</option>
-      <option value="student">Student</option>
-    </select>
-  
-    <input name="userName" type="text" id="username" placeholder="USERNAME" readonly required>
-    <input name="password" type="text" id="password" placeholder="PASSWORD" required>
-  
-    <button type="submit">REGISTER</button>
-  </form>
-  
-</div>
 
-
-
-<script>
-  function toggleDropdown(dropdownId) {
-    const dropdowns = document.getElementsByClassName("dropdown-content");
-    for (let i = 0; i < dropdowns.length; i++) {
-      if (dropdowns[i].id !== dropdownId) {
-        dropdowns[i].classList.remove('show');
-      }
-    }
-    const dropdown = document.getElementById(dropdownId);
-    dropdown.classList.toggle('show');
-  }
-
-  window.onclick = function (event) {
-    if (!event.target.matches('.dropbtn') && !event.target.matches('.arrow')) {
-      const dropdowns = document.getElementsByClassName("dropdown-content");
-      for (let i = 0; i < dropdowns.length; i++) {
-        const openDropdown = dropdowns[i];
-        if (openDropdown.classList.contains('show')) {
-          openDropdown.classList.remove('show');
-        }
-      }
-    }
-  }
-
-  function generateRandomPassword(role) {
-    let characters = '';
-    switch (role) {
-      case 'admin':
-        characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
-        break;
-      case 'treasurer':
-        characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        break;
-      case 'representative':
-        characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-        break;
-      default:
-        characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
-        break;
-    }
-    
-    let password = '';
-    const passwordLength = 10;
-    for (let i = 0; i < passwordLength; i++) {
-      const randomIndex = Math.floor(Math.random() * characters.length);
-      password += characters.charAt(randomIndex);
-    }
-    
-    return password;
-  }
-
-  function toggleAccess() {
-    const role = document.getElementById('role').value;
-    const userId = document.querySelector('input[name="userId"]').value;
-    const username = document.getElementById('username');
-    const password = document.getElementById('password');
-
-    if (role === 'student') {
-      username.disabled = true;
-      password.disabled = true;
-      username.value = ''; 
-      password.value = ''; 
-    } else if (role === 'admin' || role === 'treasurer' || role === 'representative') {
-      password.disabled = false;
-
-      if (userId) {
-        username.value = userId;
-      }
-
-      password.value = generateRandomPassword(role);
-    } else {
-      password.disabled = false;
-      username.value = '';
-      password.value = '';
-    }
-  }
-
-  document.querySelector('input[name="userId"]').addEventListener('input', function () {
-    const role = document.getElementById('role').value;
-    const username = document.getElementById('username');
-    
-    if (role === 'admin' || role === 'treasurer' || role === 'representative') {
-      username.value = this.value;
-    }
-  });
-
-</script>
-
-
+    <script src="/TREASURER_JS/Treasurer_register_user.js" ></script>
 </body>
 </html>
