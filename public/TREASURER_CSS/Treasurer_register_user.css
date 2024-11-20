@@ -58,9 +58,9 @@ header {
 }
 
 .nav a.active {
-  color: red; 
+  color: white; 
   font-weight: bold;
-  background-color: #d1e7dd; 
+  background-color: green; 
   border-radius: 5px;
 }
 
