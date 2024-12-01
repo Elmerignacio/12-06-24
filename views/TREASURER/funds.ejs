@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Year and Block Dues</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* styles.css */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            margin-top: 20px;
+        }
+
+        thead th {
+            background-color: #90c290;
+            color: #ffffff;
+            padding: 12px;
+            text-align: left;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border: 1px solid black; /* Changed border to black for header cells */
+        }
+
+        tbody td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+            border: 1px solid black; /* Changed border to black for body cells */
+        }
+
+        tbody tr:nth-child(odd) {
+            background-color: #f7f9f9;
+        }
+
+        tfoot {
+            position: sticky;
+            bottom: 0;
+            background-color: #90c290;
+            color: black;
+        }
+
+        tfoot td {
+            padding: 12px;
+            font-weight: bold;
+            border-top: 2px solid #e0e0e0;
+            border-left: 2px solid black; /* Added black border for left side of total row */
+            border-right: 2px solid black; /* Added black border for right side of total row */
+        }
+
+        .total-row {
+            background-color: #f9f9f9;
+            font-weight: bold;
+        }
+
+        td strong {
+            font-size: 16px;
+        }
+
+        .no-underline {
+            text-decoration: none;
+            color: #3d7643;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        .receive-btn {
+            background-color: #FFFFFF;
+            color: #3d7643;
+            border: 2px solid #3d7643;
+            border-radius: 20px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            text-align: center;
+            display: block;
+            margin: 20px auto 0;
+            transition: background-color 0.3s;
+        }
+
+        .receive-btn:hover {
+            background-color: #d1e7dd;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dues-table {
+            margin-top: 150px;
+        }
+    </style>
+</head>
+<body>
+    <a href="/Treasurer_dashboard" class="no-underline">Dashboard</a>
+
+    <table class="fund-table">
+        <thead>
+            <tr>
+                <th>YEAR AND BLOCK</th>
+                <% 
+                const allPayables = new Set();
+                for (const key in groupedData) {
+                    for (const payable in groupedData[key]) {
+                        allPayables.add(payable);
+                    }
+                }
+                %>
+                <% for (const payable of allPayables) { %>
+                    <th><%= payable.toUpperCase() %></th>
+                <% } %>
+            </tr>
+        </thead>
+    </table>
+    

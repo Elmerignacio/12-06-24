@@ -1,25 +1,92 @@
-function toggleDropdown(dropdownId) {
-    const dropdowns = document.getElementsByClassName("dropdown-content");
-    for (let i = 0; i < dropdowns.length; i++) {
-        if (dropdowns[i].id !== dropdownId) {
-            dropdowns[i].classList.remove('show');
-        }
-    }
-    const dropdown = document.getElementById(dropdownId);
-    dropdown.classList.toggle('show');
+document.getElementById('receiveLink').addEventListener('mouseover', function() {
+    document.getElementById('receiveDropdown').classList.add('show');
+});
+
+document.getElementById('receiveLink').addEventListener('mouseout', function() {
+    document.getElementById('receiveDropdown').classList.remove('show');
+});
+
+document.getElementById('receiveDropdown').addEventListener('mouseover', function() {
+    this.classList.add('show');
+});
+
+document.getElementById('receiveDropdown').addEventListener('mouseout', function() {
+    this.classList.remove('show');
+});
+
+
+
+document.getElementById('remittanceLink').addEventListener('mouseover', function() {
+    document.getElementById('remittanceDropdown').classList.add('show');
+});
+
+document.getElementById('remittanceLink').addEventListener('mouseout', function() {
+    document.getElementById('remittanceDropdown').classList.remove('show');
+});
+
+document.getElementById('remittanceDropdown').addEventListener('mouseover', function() {
+    this.classList.add('show');
+});
+
+document.getElementById('remittanceDropdown').addEventListener('mouseout', function() {
+    this.classList.remove('show');
+});
+
+
+
+function setupDropdown(linkId, dropdownId) {
+    const linkElement = document.getElementById(linkId);
+    const dropdownElement = document.getElementById(dropdownId);
+
+    linkElement.addEventListener('mouseover', function () {
+        dropdownElement.classList.add('show');
+    });
+
+    linkElement.addEventListener('mouseout', function () {
+        dropdownElement.classList.remove('show');
+    });
+
+    dropdownElement.addEventListener('mouseover', function () {
+        this.classList.add('show');
+    });
+
+    dropdownElement.addEventListener('mouseout', function () {
+        this.classList.remove('show');
+    });
 }
 
-window.onclick = function (event) {
-    if (!event.target.matches('.dropbtn') && !event.target.matches('.arrow')) {
-        const dropdowns = document.getElementsByClassName("dropdown-content");
-        for (let i = 0; i < dropdowns.length; i++) {
-            const openDropdown = dropdowns[i];
-            if (openDropdown.classList.contains('show')) {
-                openDropdown.classList.remove('show');
-            }
-        }
-    }
+setupDropdown('reportLink', 'reportDropdown');
+
+
+function toggleDropdown(dropdownId) {
+    const dropdownElement = document.getElementById(dropdownId);
+
+    dropdownElement.classList.toggle('show');
 }
+
+function setupDropdown(linkId, dropdownId) {
+    const linkElement = document.getElementById(linkId);
+    const dropdownElement = document.getElementById(dropdownId);
+
+    linkElement.addEventListener('mouseover', function () {
+        dropdownElement.classList.add('show');
+    });
+
+    linkElement.addEventListener('mouseout', function () {
+        dropdownElement.classList.remove('show');
+    });
+
+    dropdownElement.addEventListener('mouseover', function () {
+        this.classList.add('show');
+    });
+
+    dropdownElement.addEventListener('mouseout', function () {
+        this.classList.remove('show');
+    });
+}
+
+setupDropdown('userLink', 'userDropdown');
+
 
 document.getElementById('yearLevel').addEventListener('change', updateStudents);
 document.getElementById('block').addEventListener('change', updateStudents);
@@ -56,7 +123,7 @@ const studentSelect = document.getElementById('student');
 
 
 studentSelect.innerHTML = '<option value="" disabled selected>NAME</option>';
-studentSelect.innerHTML += '<option value="all">All Students</option>'; 
+studentSelect.innerHTML += '<option value="all">ALL STUDENT</option>'; 
 
 if (yearLevel && block) {
     fetch(`/students?yearLevel=${yearLevel}&block=${block}`)

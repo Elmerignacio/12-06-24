@@ -126,10 +126,10 @@ header {
   padding: 20px;
   border-radius: 10px;
   width: 80%;
-  margin-top: 8%;
+  margin-top: 6%;
   position: fixed;
   border-radius: 12px;
-  margin-left: 120px;
+  margin-left: 129px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
   animation: fadeIn 0.5s ease-in-out;
 }
@@ -228,6 +228,21 @@ tfoot td {
   font-size: 23px;
   }
   
+.header-section {
+  display: flex;
+   justify-content: space-between;
+    align-items: center;
+     margin-bottom: 10px
+  
+}
+.search-container {
+  text-align: right;
 
+}
+.search-style {
+  padding: 5px;
+  width: 240px;
+  margin-top: 40px;
+}
 
 

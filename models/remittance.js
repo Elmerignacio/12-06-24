@@ -14,14 +14,17 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   remittance.init({
+    userId: DataTypes.INTEGER,
     student: DataTypes.STRING,
     yearLevel: DataTypes.INTEGER,
     block: DataTypes.STRING,
+    gender: DataTypes.STRING,
     date: DataTypes.DATEONLY,
-    payable: DataTypes.STRING,
+    payables: DataTypes.STRING,
     paid: DataTypes.INTEGER,
-    balance: DataTypes.INTEGER,
-    status: DataTypes.STRING
+    balances: DataTypes.INTEGER,
+    status: DataTypes.STRING,
+    remittedBy: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'remittance',

@@ -2,12 +2,18 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('funds', {
+    await queryInterface.createTable('payables', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
+      },
+      userId: {
+        type: Sequelize.INTEGER
+      },
+      student: {
+        type: Sequelize.STRING
       },
       yearLevel: {
         type: Sequelize.INTEGER
@@ -15,10 +21,13 @@ module.exports = {
       block: {
         type: Sequelize.STRING
       },
-      amount: {
-        type: Sequelize.INTEGER
+      gender: {
+        type: Sequelize.STRING
       },
-      date: {
+      payables: {
+        type: Sequelize.STRING
+      },
+      balances: {
         type: Sequelize.INTEGER
       },
       createdAt: {
@@ -32,6 +41,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('funds');
+    await queryInterface.dropTable('payables');
   }
 };

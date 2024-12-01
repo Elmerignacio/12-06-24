@@ -1,134 +1,168 @@
 body {
-    font-family: Arial, sans-serif;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background-color: #f9f9f9;
+  padding-top: 80px;
+}
+
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background-color: #f9f9f9;
+  padding-top: 80px; 
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #f8f8f8;
+  padding: 10px;
+  border-bottom: 2px solid green;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo img {
+  width: 150px;
+  height: 100px;
+}
+
+.logo span {
+  font-size: 20px;
+  font-weight: bold;
+  color: rgb(0, 0, 0);
+  text-align: left;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.nav a {
+  text-decoration: none;
+  color: green;
+  font-weight: bold;
+  padding: 10px 15px;
+  transition: background-color 0.3s;
+}
+
+.nav a.active {
+  color: white; 
+  font-weight: bold;
+  background-color: green; 
+  border-radius: 5px;
+}
+
+.nav a:hover {
+  background-color: #d1e7dd; 
+  border-radius: 5px;
+}
+
+.dropdown {
+  position: relative;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: black;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {
+  background-color: #d1e7dd;
+}
+
+
+.show {
+  display: block;
+}
+
+.dropbtn {
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
+  color: green;
+  font-weight: bold;
+  padding: 10px;
+}
+
+.arrow {
+  cursor: pointer;
+  display: inline-block;
+  padding-left: 5px;
+}
+
+.user-icon {
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 20px;
+  margin-left: 20px;
+}
+
+  .card-container {
+    display: flex;
+    gap: 40px;
+    margin-top: 100px;
+  }
+  
+  .card {
+    flex: 1;
+    background-color: #bbdfc1;
+    padding: 120px;
+    border-radius: 50px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.5s ease-in-out;
+  }
+  
+  .card h2 {
     margin: 0;
-    background-color: #f9f9f9;
-    padding-top: 80px;
   }
   
   
-  body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    background-color: #f9f9f9;
-    padding-top: 80px; 
+  .welcome {
+    margin-top: 50px;
+    font-size: 30px;
+    animation: fadeIn 0.5s ease-in-out;
   }
   
-  header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background-color: #f8f8f8;
-    padding: 10px;
-    border-bottom: 2px solid green;
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 1000;
-  }
   
-  .logo {
-    display: flex;
-    align-items: center;
-  }
-  
-  .logo img {
-    width: 150px;
-    height: 100px;
-  }
-  
-  .logo span {
-    font-size: 20px;
-    font-weight: bold;
-    color: rgb(0, 0, 0);
-    text-align: left;
-  }
-  
-  .nav {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-  }
-  
-  .nav a {
-    text-decoration: none;
-    color: green;
-    font-weight: bold;
-    padding: 10px 15px;
-    transition: background-color 0.3s;
-  }
-  .receive{
-    color: red;
-    font-weight: bold;
-    padding: 10px 15px;
-    transition: background-color 0.3s;
-    background-color: #d1e7dd; 
-
+  .padding {
+    padding: 50px;
   }
 
-  .nav a:hover {
-    background-color: #d1e7dd; 
-    border-radius: 5px;
-  }
   
-  .dropdown {
-    position: relative;
-  }
-  
-  .dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #f9f9f9;
-    min-width: 160px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    z-index: 1;
-  }
-  
-  .dropdown-content a {
-    color: black;
-    text-decoration: none;
-    display: block;
-  }
-  
-  .dropdown-content a:hover {
-    background-color: #d1e7dd;
-  }
-  
-  
-  .show {
-    display: block;
-  }
-  
-  .dropbtn {
-    cursor: pointer;
-    background-color: transparent;
-    border: none;
-    color: green;
-    font-weight: bold;
-    padding: 10px;
-  }
-  
-  .arrow {
-    cursor: pointer;
-    display: inline-block;
-    padding-left: 5px;
-  }
-  
-  .user-icon {
-    height: 40px;
-    border-radius: 50%;
-    margin-right: 20px;
-    margin-left: 20px;
-  }
-
 .container {
     background-color: #c9e6d1;
     padding: 20px;
     border-radius: 10px;
     width: 80%;
-    margin-top: 8%;
+    margin-top: 5%;
     position: fixed;
     border-radius: 12px;
-    margin-left: 120px;
+    margin-left: 130px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
     animation: fadeIn 0.5s ease-in-out;
 }
@@ -231,105 +265,84 @@ input[type="text"] {
     text-decoration: none;
     color: #3d7643;
 }
-
-@keyframes fadeIn {
+  
+  
+  @keyframes fadeIn {
     from {
-        opacity: 0;
-        transform: translateY(-10px);
+      opacity: 0;
+      transform: translateY(-10px);
     }
     to {
-        opacity: 1;
-        transform: translateY(0);
+      opacity: 1;
+      transform: translateY(0);
     }
+  }
+  
+  .fa-solid {
+  margin-right: 70px;
+  font-size: 23px;
+  }
+  .notification {
+    padding: 15px;
+    margin: 19px;
+    border-radius: 5px;
+    text-align: center;
 }
-       /* Flexbox for Payable and Amount fields */
-       .payable-amount-container {
-        display: flex;
-        justify-content: space-between;
-        gap: 10px; /* Space between the two fields */
-    }
 
-    .payable-field,
-    .amount-field {
-        flex: 1; /* Equal width for both fields */
-    }
+.success {
+    background-color: #4CAF50;  
+    color: white;
+}
 
-    .payable-field select,
-    .amount-field input {
-        width: 100%; /* Ensure the input/select takes full width of the container */
-  /* Flex container for name fields */
-    }
+.error {
+    background-color: #f44336;  
+    color: white;
+}
+
+input[type="text"], select {
+    text-transform: uppercase;
+}
+
+
+  
 .name-container {
     display: flex;
-    justify-content: space-between;
-    gap: 20px; /* Space between the name fields */
-    margin-bottom: 10px; /* Space below the name fields */
+    justify-content: flex-start;
+    gap: 20px; 
+    margin-bottom: 10px; 
+    width: 100%; 
 }
 
 .name-field {
-    flex: 1; /* Makes the fields take equal space */
+    flex: 1; 
 }
 
-/* Flex container for Gender and Year Level fields */
+.name-container input[type="text"] {
+    text-align: left; 
+}
+
 .gender-yearLevel-container {
     display: flex;
     justify-content: space-between;
-    gap: 20px; /* Space between gender and year level fields */
-    margin-bottom: 10px; /* Space below the fields */
+    gap: 20px; 
+    margin-bottom: 10px; 
 }
 
 .gender-field, .yearLevel-field {
-    flex: 1; /* Makes both fields take equal space */
+    flex: 1; 
 }
 
-/* Modal content styling */
-.modal-content {
-    max-width: 600px;
-    margin: auto;
-    padding: 20px;
-    background-color: black;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.modal-content h3 {
-    text-align: center;
-}
-
-.modal-actions {
+.payable-amount-container {
     display: flex;
     justify-content: space-between;
-    padding-top: 10px;
+    gap: 10px;
 }
 
-.modal-content h3 {
-    text-align: center;
+.payable-field select,
+.amount-field input {
+    width: 100%; 
 }
 
-.modal-actions {
-    display: flex;
-    justify-content: space-between;
-    padding-top: 10px;
-}
-
-    .payables-list {
-        max-height: 300px; /* Set a max-height */
-        overflow-y: auto; /* Enable vertical scroll */
-        margin-bottom: 10px;
-    }
-
-    .payable-edit {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin: 5px 0;
-    }
-
-    .payable-edit input {
-        width: 150px; /* Set a fixed width for the inputs */
-    }
-
-  /* Modal content styling */
 .modal-content {
     max-width: 600px;
     margin: auto;
@@ -337,14 +350,13 @@ input[type="text"] {
     background-color: #d0e8d0;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    position: relative; /* Added to position the close button */
+    position: relative;
 }
 
 .modal-content h3 {
     text-align: center;
 }
 
-/* Close button styling */
 .close {
     position: absolute;
     top: 10px;
@@ -359,7 +371,6 @@ input[type="text"] {
     color: #f44336;
 }
 
-/* Modal styles */
 .edit-modal {
     position: fixed;
     top: 0;
@@ -417,7 +428,7 @@ input[type="text"] {
     border-radius: 4px;
     font-size: 16px;
     cursor: pointer;
-    margin: 15px 0 5px;
+    margin: 10px 0;
     transition: background-color 0.3s ease;
 }
 
@@ -425,29 +436,51 @@ input[type="text"] {
     background-color: #45a049;
 }
 
-.modal-content button:focus {
-    outline: none;
+.userId-block-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    width: 100%; 
 }
 
-/* Mobile view adjustments */
-@media screen and (max-width: 600px) {
-    .modal-content {
-        width: 90%;
-    }
 
-    .modal-content h3 {
-        font-size: 1.2rem;
-    }
-
-    .modal-content button {
-        font-size: 14px;
-    }
+.form-group {
+    flex: 1; 
 }
-.fa-solid {
-    margin-right: 70px;
-    font-size: 23px;
-    }
 
-    
-    
+input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+.userId-block-container input[type="text"] {
+  text-align: left; 
+}
+
+.flex{
+  margin-left: 7px;
+}
+
+.username-password-container {
+  display: flex;
+  justify-content: flex-start;
+  gap: 20px; 
+  margin-bottom: 10px; 
+  width: 100%; 
+}
+
+.username-field,
+.password-field {
+  flex: 1; 
+}
+
+.username-password-container input[type="text"] {
+  text-align: left; 
+}
+
+
 

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archived Students</title>
+</head>
+<style>
+    /* styles.css */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;  
+}
+
+h1 {
+    text-align: left; /* Align text to the left */
+    color: #333333;
+    margin-bottom: 20px;
+}
+
+.student-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+.student-table th,
+.student-table td {
+    border: 1px solid black; /* Updated border color to black */
+    text-align: left;
+    padding: 12px;
+}
+
+.student-table th {
+    background-color: #90c290;
+    color: white;
+    text-transform: uppercase;
+}
+
+.student-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.student-table tr:hover {
+    background-color: #f1f1f1;
+    transition: background-color 0.3s;
+}
+
+.restore-btn {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.restore-btn:hover {
+    background-color: #218838;
+}
+
+</style>
+<body>
+    <div class="container">
+        <a href="/treasurer_3A_verify_remittance">Back</a>
+        <h1 class="head1">Archived Students</h1>
+        <table class="student-table">
+          <thead>
+            <tr>
+              <th>User ID</th>
+              <th>First Name</th>
+              <th>Last Name</th>
+              <th>Year Level</th>
+              <th>Block</th>
+              <th>Gender</th>
+              <th>Role</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (archivedStudents.length > 0) { %>
+              <% archivedStudents.forEach(student => { %>
+                <tr>
+                  <td><%= student.userId %></td>
+                  <td><%= student.firstName %></td>
+                  <td><%= student.lastName %></td>
+                  <td><%= student.yearLevel %></td>
+                  <td><%= student.block %></td>
+                  <td><%= student.gender %></td>
+                  <td><%= student.role %></td> <!-- Added Role -->
+                  <td>
+                    <form method="POST" action="/Treasurer_display_archive">
+                      <input type="hidden" name="userId" value="<%= student.userId %>">
+                      <button class="restore-btn" type="submit">Restore</button>
+                    </form>
+                  </td>
+                </tr>
+              <% }); %>
+            <% } else { %>
+              <tr>
+                <td colspan="8">No archived students found.</td> <!-- Adjusted colspan -->
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+      
+      
+      
+</body>
+</html>

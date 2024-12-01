@@ -1,9 +1,4 @@
-ody {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  background-color: #f9f9f9;
-  padding-top: 80px;
-}
+
 
 
 body {
@@ -127,7 +122,7 @@ header {
   border-radius: 10px;
   width: 460px;
   margin: 60px auto;
-  margin-top: 95px;
+  margin-top: 140px;
   border-radius: 12px;
   box-shadow: 0 8px 16px rgba(107, 69, 69, 0.1);
   animation: fadeIn 0.5s ease-in-out;
@@ -180,8 +175,8 @@ button:hover {
   font-weight: bold;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   position: absolute; 
-  left: 86%; 
-  top: 18%; 
+  left: 48.7%; 
+  top: 50%; 
   transform: translateX(-50%); 
   z-index: 1000; 
 }

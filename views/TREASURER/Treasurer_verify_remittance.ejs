@@ -18,46 +18,61 @@
             <a href="Treasurer_create_payable" class="nav-link" id="payableLink">PAYABLE</a>
             
             <div class="dropdown">
-              <a href="#" class="dropbtn nav-link" id="receiveLink" onclick="toggleDropdown('receiveDropdown')">RECEIVE</a>
-              <span class="arrow" onclick="toggleDropdown('receiveDropdown')"></span>
-              <div class="dropdown-content" id="receiveDropdown">
-                <a href="Treasurer_BSIT_3A_remittance">BSIT-3A</a>
-                <a href="Treasurer_BSIT_3B_remittance">BSIT-3B</a>
-              </div>
+                <a href="#" class="dropbtn nav-link" id="receiveLink">RECEIVE</a>
+                <span class="arrow"></span>
+                <div class="dropdown-content" id="receiveDropdown">
+                    <a href="#">BSIT-1A</a>
+                    <a href="#">BSIT-1B</a>
+                    <a href="#">BSIT-2A</a>
+                    <a href="#">BSIT-2B</a>
+                    <a href="Treasurer_BSIT_3A_remittance">BSIT-3A</a>
+                    <a href="Treasurer_BSIT_3B_remittance">BSIT-3B</a>
+                    <a href="#">BSIT-4A</a>
+                    <a href="#">BSIT-4B</a>
+                </div>
             </div>
-          
+
             <div class="dropdown">
-              <a href="#" class="dropbtn nav-link" id="remittanceLink" onclick="toggleDropdown('remittanceDropdown')">REMITTANCE</a>
-              <span class="arrow" onclick="toggleDropdown('remittanceDropdown')"></span>
-              <div class="dropdown-content" id="remittanceDropdown">
-                <a href="Treasurer_3A_verify_remittance">BSIT-3A</a>
-                <a href="treasurer_3B_verify_remittance">BSIT-3B</a>
-              </div>
+                <a href="#" class="dropbtn nav-link" id="remittanceLink">REMITTANCE</a>
+                <span class="arrow"></span>
+                <div class="dropdown-content" id="remittanceDropdown">
+                    <a href="#">BSIT-1A</a>
+                    <a href="#">BSIT-1B</a>
+                    <a href="#">BSIT-2A</a>
+                    <a href="#">BSIT-2B</a>
+                    <a href="treasurer_3A_verify_remittance">BSIT-3A</a>
+                    <a href="treasurer_3B_verify_remittance">BSIT-3B</a>
+                    <a href="#">BSIT-4A</a>
+                    <a href="#">BSIT-4B</a>
+                </div>
             </div>
-          
+            
             <div class="dropdown">
-              <a href="#" class="dropbtn nav-link" id="reportLink" onclick="toggleDropdown('reportDropdown')">REPORT</a>
-              <span class="arrow" onclick="toggleDropdown('reportDropdown')"></span>
-              <div class="dropdown-content" id="reportDropdown">
-                <a href="#">MONTHLY REPORT</a>
-                <a href="#">EXPENSES</a>
-              </div>
+                <a href="#" class="dropbtn nav-link" id="reportLink">REPORT</a>
+                <span class="arrow"></span>
+                <div class="dropdown-content" id="reportDropdown">
+                    <a href="#">MONTHLY REPORT</a>
+                    <a href="#">EXPENSES</a>
+                </div>
             </div>
+            
             <a href="Treasurer_register_user" class="nav-link" id="registerLink">REGISTER</a>
             
             <div class="dropdown">
-              <a href="#" class="dropbtn nav-link" id="reportLink" onclick="toggleDropdown('userDropdown')"><i class="fa-solid fa-user"></i></a>
-              <span class="arrow" onclick="toggleDropdown('userDropdown')"></span>
-              <div class="dropdown-content" id="userDropdown">
-                  <a href="#">MANAGE ACCOUNT</a>
-                  <a href="Login">LOGOUT</a>
-              </div>
-              </div>
+                <a href="#" class="dropbtn nav-link" id="userLink" onclick="toggleDropdown('userDropdown')">
+                    <i class="fa-solid fa-user"></i>
+                </a>
+                <span class="arrow" onclick="toggleDropdown('userDropdown')"></span>
+                <div class="dropdown-content" id="userDropdown">
+                    <a href="#">MANAGE ACCOUNT</a>
+                    <a href="logout">LOGOUT</a>
+                </div>
+            </div>
         </nav>
     </header>
 
     <div class="container">
-        <p><strong><%= blockKey %></strong></p>
+        <p><strong name="yearBlock"><%= blockKey %></strong></p>
         
         <% if (representativeNames.length > 0) { %>
             <% representativeNames.forEach(name => { %>
@@ -73,9 +88,11 @@
                     <tr>
                         <th>Date</th>
                         <th>Student Name</th>
-                        <th>Payment</th>
+                        <th>Payables</th>
                         <th>Amount Paid</th>
-                        <th>Remitted by</th>
+                        <th id="remittedByHeader" onclick="toggleRemittedByOptions()">Remitted by</th>
+
+
                     </tr>
                 </thead>
                 <tbody>
@@ -83,11 +100,14 @@
                     <% let totalBalance = 0; %>
                     <% studentRemittances.forEach(remittance => { %>
                         <tr data-date="<%= remittance.date %>" data-status="<%= remittance.status %>">
-                            <td><%= remittance.date%></td>
+                            <td><%= remittance.date %></td>
                             <td><%= remittance.studentName %></td>
                             <td><%= remittance.payment %></td>
-                            <td><%= remittance.amountPaid %></td>
-                            <td><%= remittance.studentName %></td>
+                            <td><%= remittance.amountPaid %></td>   
+                            <td><%= remittance.representativeName %></td>
+                            
+                            <input type="hidden" name="payment" value="<%= remittance.payment %>">
+                            <input type="hidden" name="amountPaid" value="<%= remittance.amountPaid %>">
                         </tr>
                         
                         <% 
@@ -113,77 +133,185 @@
             </div>
         </div>
     </div>
-    <form id="popupForm" class="popup-form" action="/Treasurer_save_fund" method="post" style="display: none;">
-        <div class="popup-content">
-            <span class="close" onclick="closePopup()">&times;</span>
-    
-            <div class="remittance-table"> 
-                <h2>REMITTANCE</h2>
-                <span class="span"><%= blockKey %></span> 
     
 
-                <label for="date">Date:</label>
-                <input type="date" id="date" name="date" onchange="updateCollectedAmount()"> 
-    
-                <table>
-                    <thead>
-                        <tr>
-                            <th>DENOMINATION</th>
-                            <th>AMOUNT</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+<form id="popupForm" class="popup-form" action="/Treasurer_save_fund" method="post" style="display: none;">
+    <div class="popup-content">
+        <span class="close" onclick="closePopup()">&times;</span>
+
+        <div class="remittance-table"> 
+            <h2>REMITTANCE</h2>
+            
+            <!-- Hidden Input for yearBlock -->
+            <input type="hidden" name="yearBlock" value="<%= blockKey %>">
+
+            <label for="date">Date:</label>
+            <% denominations.forEach(denom => { %>
+                <input type="date" name="date" value="<%= denom.date %>" required>
+            <% }) %>
+             
+            <table>
+                <thead>
+                    <tr>
+                        <th class="text">DENOMINATION</th>
+                        <th class="text">AMOUNT</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% denominations.forEach(denom => { %>
                         <tr>
                             <td>1,000</td>
-                            <td><input type="number" class="amount-input" data-denomination="1000" min="0"></td>
+                            <td>
+                                <input type="number" 
+                                       name="Amount1000" 
+                                       class="amount-input" 
+                                       data-denomination="1000" 
+                                       min="0" 
+                                       value="<%= denom.Amount1000 %>" 
+                                       onchange="updateCollectedAmount()" required>
+                            </td>
                         </tr>
                         <tr>
                             <td>500</td>
-                            <td><input type="number" class="amount-input" data-denomination="500" min="0"></td>
+                            <td>
+                                <input type="number" 
+                                       name="Amount500" 
+                                       class="amount-input" 
+                                       data-denomination="500" 
+                                       min="0" 
+                                       value="<%= denom.Amount500 %>" 
+                                       onchange="updateCollectedAmount()" required>
+                            </td>
                         </tr>
                         <tr>
                             <td>200</td>
-                            <td><input type="number" class="amount-input" data-denomination="200" min="0"></td>
+                            <td>
+                                <input type="number" 
+                                       name="Amount200" 
+                                       class="amount-input" 
+                                       data-denomination="200" 
+                                       min="0" 
+                                       value="<%= denom.Amount200 %>" 
+                                       onchange="updateCollectedAmount()" required>
+                            </td>
                         </tr>
                         <tr>
                             <td>100</td>
-                            <td><input type="number" class="amount-input" data-denomination="100" min="0"></td>
+                            <td>
+                                <input type="number" 
+                                       name="Amount100" 
+                                       class="amount-input" 
+                                       data-denomination="100" 
+                                       min="0" 
+                                       value="<%= denom.Amount100 %>" 
+                                       onchange="updateCollectedAmount()" required>
+                            </td>
                         </tr>
                         <tr>
                             <td>50</td>
-                            <td><input type="number" class="amount-input" data-denomination="50" min="0"></td>
+                            <td>
+                                <input type="number" 
+                                       name="Amount50" 
+                                       class="amount-input" 
+                                       data-denomination="50" 
+                                       min="0" 
+                                       value="<%= denom.Amount50 %>" 
+                                       onchange="updateCollectedAmount()" required>
+                            </td>
                         </tr>
                         <tr>
                             <td>20</td>
-                            <td><input type="number" class="amount-input" data-denomination="20" min="0"></td>
+                            <td>
+                                <input type="number" 
+                                       name="Amount20" 
+                                       class="amount-input" 
+                                       data-denomination="20" 
+                                       min="0" 
+                                       value="<%= denom.Amount20 %>" 
+                                       onchange="updateCollectedAmount()" required>
+                            </td>
                         </tr>
                         <tr>
-                            <td>coins</td>
-                            <td><input type="number" class="amount-input" data-denomination="1" min="0"></td>
+                            <td>Coins</td>
+                            <td>
+                                <input type="number" 
+                                       name="coins" 
+                                       class="amount-input" 
+                                       data-denomination="1" 
+                                       min="0" 
+                                       value="<%= denom.coin %>" 
+                                       onchange="updateCollectedAmount()" required>
+                            </td>
                         </tr>
-                        <tr>
-                            <td>Total Amount Remitted</td>
-                            <td>₱<span id="totalAmount">0.00</span></td>
-                        </tr>
-                    </tbody>
-                </table>
-    
-                <p class="Amount">Amount Collected: ₱<span id="collectedAmount">0.00</span></p>
-    
-                <p class="Status" ><strong>Status:</strong> <span id="status"></span></p>
-    
-                <input type="hidden" name="Receive" value="true">
-    
-                <button type="submit" class="receive-btn" id="receiveButton" disabled>RECEIVE</button>
-            </div>
+                    <% }) %>
+                    <tr>
+                        <td>Total Amount Remitted</td>
+                        <td><%= totalAmountPaid %></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p class="Amount">Amount Collected: ₱<span id=""><%= totalAmountPaid %></span></p>
+
+            <% if (studentRemittances.length > 0) { %>
+                <p class="Status"><strong>Status:</strong> <%= studentRemittances[0].status %></p>
+            <% } %>
+
+            <!-- Hidden Input for Total Amount -->
+            <input type="hidden" name="collectedAmount" id="collectedAmountInput">
+
+            <button type="submit" class="submit-btn">Submit Remittance</button>
         </div>
-    </form>
+    </div>
+</form>
+
+
+    <script>
+
+
+
+        // Dropdown for "Remitted by"
+        function toggleRemittedByOptions() {
+            const dropdown = document.getElementById('remittedByDropdown');
+            const header = document.getElementById('remittedByHeader');
+            const rect = header.getBoundingClientRect();
     
+            // Toggle dropdown visibility and position
+            if (dropdown.style.display === 'block') {
+                dropdown.style.display = 'none';
+            } else {
+                dropdown.style.display = 'block';
+                dropdown.style.left = `${rect.left}px`;
+                dropdown.style.top = `${rect.bottom + window.scrollY}px`;
+            }
+        }
     
+        // Close dropdown if clicked outside
+        window.addEventListener('click', function (event) {
+            const dropdown = document.getElementById('remittedByDropdown');
+            const header = document.getElementById('remittedByHeader');
+            if (!header.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
     
+        // Handle selection from dropdown
+        function selectRemittedBy(option) {
+            alert(`Selected: ${option}`); // Replace this logic with what should happen after selection.
+            document.getElementById('remittedByDropdown').style.display = 'none';
+        }
+    </script>
     
-    <script src="/TREASURER_JS/Treasurer_verify_remittance.js"> </script>
+    <!-- Dropdown Menu -->
+    <div id="remittedByDropdown" class="dropdown-menu" style="display: none; position: absolute; z-index: 100;">
+        <ul style="list-style-type: none; margin: 0; padding: 0; background: #fff; border: 1px solid #ddd; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+            <li style="padding: 8px 16px; cursor: pointer;" onclick="selectRemittedBy('Treasurer')">Treasurer</li>
+            <li style="padding: 8px 16px; cursor: pointer;" onclick="selectRemittedBy('Representative')">Representative</li>
+        </ul>
+    </div>
+        
     
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="/TREASURER_JS/treasurer_verify_remittance.js"></script>
 </body>
 </html>

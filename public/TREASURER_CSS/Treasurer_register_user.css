@@ -127,7 +127,7 @@ header {
   width: 460px;
   margin-top: 65px;
   position: fixed;
-  left: 25%;
+  left: 27%;
   border-radius: 12px;
   margin-left: 100px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
@@ -186,6 +186,7 @@ button:hover {
  .register {
   margin-top: 0;
  }
+
 .notification {
   display: none;
   background-color: #f44336; 
@@ -197,16 +198,14 @@ button:hover {
   font-weight: bold;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   position: absolute; 
-  left: 86%; 
-  top: 18%; 
+  left: 49.2%; 
+  top: 44%; 
   transform: translateX(-50%); 
   z-index: 1000; 
 }
 input {
   text-transform: uppercase;
 }
-
-
 
 
  @keyframes fadeIn {

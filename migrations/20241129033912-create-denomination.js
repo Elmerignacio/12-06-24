@@ -2,26 +2,35 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('payables', {
+    await queryInterface.createTable('denominations', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      yearLevel: {
-        type: Sequelize.STRING
+      date: {
+        type: Sequelize.DATEONLY
       },
-      block: {
-        type: Sequelize.STRING
+      Amount1000: {
+        type: Sequelize.INTEGER
       },
-      student: {
-        type: Sequelize.STRING
+      Amount500: {
+        type: Sequelize.INTEGER
       },
-      description: {
-        type: Sequelize.STRING
+      Amount200: {
+        type: Sequelize.INTEGER
       },
-      amount: {
+      Amount100: {
+        type: Sequelize.INTEGER
+      },
+      Amount50: {
+        type: Sequelize.INTEGER
+      },
+      Amount20: {
+        type: Sequelize.INTEGER
+      },
+      coin: {
         type: Sequelize.INTEGER
       },
       createdAt: {
@@ -35,6 +44,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('payables');
+    await queryInterface.dropTable('denominations');
   }
 };

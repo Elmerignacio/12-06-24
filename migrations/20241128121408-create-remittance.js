@@ -9,6 +9,9 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      userId: {
+        type: Sequelize.INTEGER
+      },
       student: {
         type: Sequelize.STRING
       },
@@ -18,19 +21,25 @@ module.exports = {
       block: {
         type: Sequelize.STRING
       },
+      gender: {
+        type: Sequelize.STRING
+      },
       date: {
         type: Sequelize.DATEONLY
       },
-      payable: {
+      payables: {
         type: Sequelize.STRING
       },
       paid: {
         type: Sequelize.INTEGER
       },
-      balance: {
+      balances: {
         type: Sequelize.INTEGER
       },
       status: {
+        type: Sequelize.STRING
+      },
+      remittedBy: {
         type: Sequelize.STRING
       },
       createdAt: {

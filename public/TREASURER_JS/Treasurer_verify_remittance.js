@@ -1,93 +1,119 @@
-function calculateTotal() {
-    var amountInputs = document.querySelectorAll('.amount-input');
-    var totalAmount = 0;
-
-    amountInputs.forEach(function(input) {
-        var denomination = parseFloat(input.getAttribute('data-denomination'));
-        var amount = parseInt(input.value) || 0; 
-        totalAmount += denomination * amount;
-    });
-
-    document.getElementById('totalAmount').textContent = totalAmount.toFixed(2); 
-    document.getElementById('collectedAmount').textContent = totalAmount.toFixed(2); 
-
-    checkAmounts();
-}
-
-document.querySelectorAll('.amount-input').forEach(function(input) {
-    input.addEventListener('input', calculateTotal);
-});
-
-function toggleDropdown(id) {
-    const dropdown = document.getElementById(id);
-    dropdown.classList.toggle("show");
-}
-
 function openPopup() {
+    // Show the popup form
     document.getElementById("popupForm").style.display = "flex";
+
+    // Automatically update collected amount when popup is opened
+    updateCollectedAmount();
 }
 
 function closePopup() {
     document.getElementById("popupForm").style.display = "none";
 }
 
-function updateCollectedAmount() {
-    const selectedDate = document.getElementById("date").value;
-    const tableRows = document.querySelectorAll(".scrollable-table-container tbody tr");
-    let collectedAmount = 0;
-    let statusText = "Pending"; 
+document.getElementById('receiveLink').addEventListener('mouseover', function() {
+    document.getElementById('receiveDropdown').classList.add('show');
+});
 
-    document.getElementById("collectedAmount").textContent = "0.00";
+document.getElementById('receiveLink').addEventListener('mouseout', function() {
+    document.getElementById('receiveDropdown').classList.remove('show');
+});
 
-    tableRows.forEach(row => {
-        const rowDate = row.getAttribute("data-date").trim();
-        const amountPaid = parseFloat(row.querySelector("td:nth-child(4)").textContent.trim()) || 0;
-        const status = row.getAttribute("data-status").trim();
+document.getElementById('receiveDropdown').addEventListener('mouseover', function() {
+    this.classList.add('show');
+});
 
-        if (rowDate === selectedDate) {
-            collectedAmount += amountPaid; 
-            statusText = status || "Pending"; 
-        }
+document.getElementById('receiveDropdown').addEventListener('mouseout', function() {
+    this.classList.remove('show');
+});
+
+document.getElementById('remittanceLink').addEventListener('mouseover', function() {
+    document.getElementById('remittanceDropdown').classList.add('show');
+});
+
+document.getElementById('remittanceLink').addEventListener('mouseout', function() {
+    document.getElementById('remittanceDropdown').classList.remove('show');
+});
+
+document.getElementById('remittanceDropdown').addEventListener('mouseover', function() {
+    this.classList.add('show');
+});
+
+document.getElementById('remittanceDropdown').addEventListener('mouseout', function() {
+    this.classList.remove('show');
+});
+
+function setupDropdown(linkId, dropdownId) {
+    const linkElement = document.getElementById(linkId);
+    const dropdownElement = document.getElementById(dropdownId);
+
+    linkElement.addEventListener('mouseover', function () {
+        dropdownElement.classList.add('show');
     });
 
-    document.getElementById("collectedAmount").textContent = collectedAmount.toFixed(2);
-    document.getElementById("status").textContent = statusText;
+    linkElement.addEventListener('mouseout', function () {
+        dropdownElement.classList.remove('show');
+    });
 
-    checkAmounts();
+    dropdownElement.addEventListener('mouseover', function () {
+        this.classList.add('show');
+    });
+
+    dropdownElement.addEventListener('mouseout', function () {
+        this.classList.remove('show');
+    });
 }
 
-function checkAmounts() {
-    const collectedAmount = parseFloat(document.getElementById("collectedAmount").textContent.trim());
-    const totalAmount = parseFloat(document.getElementById("totalAmount").textContent.trim());
+setupDropdown('reportLink', 'reportDropdown');
+setupDropdown('userLink', 'userDropdown');
 
-    const receiveButton = document.getElementById("receiveButton");
+window.addEventListener('load', function() {
+    const currentPath = window.location.pathname;
+    const links = document.querySelectorAll('.nav-link');
+    links.forEach(link => {
+        if (currentPath.includes(link.getAttribute('href'))) {
+            link.classList.add('active');
+        } else {
+            link.classList.remove('active');
+        }
+    });
+});
 
-    if (collectedAmount === totalAmount) {
-        receiveButton.disabled = false;
-    } else {
-        receiveButton.disabled = true;
+window.onload = function() {
+    const currentPage = window.location.href;  
+    const receiveLink = document.getElementById('receiveLink');
+
+    if (currentPage.includes("Treasurer_BSIT_3A_remittance") || currentPage.includes("Treasurer_BSIT_3B_remittance")) {
+        receiveLink.classList.add('active');
     }
 }
 
-function toggleDropdown(dropdownId, buttonId) {
-const dropdownContent = document.getElementById(dropdownId);
-const button = document.getElementById(buttonId);
-
-dropdownContent.classList.toggle("show");
-
-button.classList.toggle("active");
+function toggleDropdown(id) {
+    var dropdown = document.getElementById(id);
+    dropdown.classList.toggle("show");
 }
 
 window.onload = function() {
-const currentPage = window.location.href;  
-const receiveLink = document.getElementById('receiveLink');
-const remittanceLink = document.getElementById('remittanceLink');
+    // Function to calculate and update the total collected amount
+    function updateCollectedAmount() {
+        let totalAmount = 0;    
+        // Loop through each input with the 'amount-input' class
+        document.querySelectorAll('.amount-input').forEach(function(input) {
+            const denomination = parseFloat(input.getAttribute('data-denomination'));
+            const amount = parseFloat(input.value) || 0; // Default to 0 if empty or NaN
+            totalAmount += amount * denomination;  // Multiply by denomination
+        });
 
-if (currentPage.includes("Treasurer_BSIT_3A_remittance") || currentPage.includes("Treasurer_BSIT_3B_remittance")) {
-receiveLink.classList.add('active');
-}
+        // Update the displayed amount
+        document.getElementById('totalAmount').textContent = totalAmount.toFixed(2);
+        document.getElementById('collectedAmount').textContent = totalAmount.toFixed(2);
+        document.getElementById('collectedAmountInput').value = totalAmount.toFixed(2);  // Set the hidden input value
+    }
 
-if (currentPage.includes("Treasurer_3A_verify_remittance") || currentPage.includes("treasurer_3B_verify_remittance")) {
-remittanceLink.classList.add('active');
-}
-}
+    // Call the function once to populate initial values
+    updateCollectedAmount();
+
+    // Set up event listeners for all input fields to update the total amount when changed
+    document.querySelectorAll('.amount-input').forEach(function(input) {
+        input.addEventListener('input', updateCollectedAmount);
+    });
+};
