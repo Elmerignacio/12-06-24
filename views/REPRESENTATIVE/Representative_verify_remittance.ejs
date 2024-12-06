@@ -56,6 +56,10 @@
 
     <div class="container">
         <p><strong><%= blockKey %></strong></p>
+
+
+
+
         
         <% if (representativeNames.length > 0) { %>
             <% representativeNames.forEach(name => { %>
@@ -118,6 +122,11 @@
             <div class="remittance-table"> 
                 <h2>REMITTANCE</h2>
                 <span class="span"><%= blockKey %></span> 
+
+                <input type="hidden" name="block" value="<%= block || 'defaultBlockValue' %>">
+
+                <input type="hidden" name="yearLevel" value="<%=yearLevel %>">
+    
     
 
                 <label for="date">Date:</label>

@@ -117,3 +117,51 @@ window.onload = function() {
         input.addEventListener('input', updateCollectedAmount);
     });
 };
+
+
+function updateTotal() {
+    var total = 0;
+    document.querySelectorAll('.amount-input').forEach(function(input) {
+        total += parseFloat(input.value || 0) * parseFloat(input.getAttribute('data-denomination'));
+    });
+
+    document.getElementById('totalAmount').textContent = total.toFixed(2);
+
+    var collectedAmount = parseFloat(document.querySelector('input[name="collectedAmount"]').value);
+    if (total === collectedAmount) {
+        document.getElementById('submitBtn').disabled = false;
+    } else {
+        document.getElementById('submitBtn').disabled = true;
+    }
+}
+function calculateTotal() {
+var amountInputs = document.querySelectorAll('.amount-input');
+var totalAmount = 0;
+
+amountInputs.forEach(function(input) {
+var denomination = parseFloat(input.getAttribute('data-denomination'));
+var amount = parseInt(input.value) || 0; 
+totalAmount += denomination * amount;
+});
+
+document.getElementById('totalAmount').textContent = totalAmount.toFixed(2);
+
+}
+
+document.querySelectorAll('.amount-input').forEach(function(input) {
+input.addEventListener('input', calculateTotal);
+});
+
+function toggleDropdown(id) {
+const dropdown = document.getElementById(id);
+dropdown.classList.toggle("show");
+}
+
+function openPopup() {
+document.getElementById("popupForm").style.display = "flex";
+}
+
+function closePopup() {
+document.getElementById("popupForm").style.display = "none";
+}
+

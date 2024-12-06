@@ -132,7 +132,7 @@ if (yearLevel && block) {
             data.students.forEach(student => {
                 const option = document.createElement('option');
                 option.value = [student.firstName, student.lastName].join(' ');
-                option.textContent = `${student.firstName} ${student.lastName}`;
+                option.textContent = `${student.lastName} ${student.firstName}`;
                 studentSelect.appendChild(option);
             });
         })

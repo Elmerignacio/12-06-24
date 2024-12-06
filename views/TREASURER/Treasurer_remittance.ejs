@@ -52,7 +52,7 @@
                 <span class="arrow"></span>
                 <div class="dropdown-content" id="reportDropdown">
                     <a href="#">MONTHLY REPORT</a>
-                    <a href="/treasurer_create_expenses">EXPENSES</a>
+                    <a href="#">EXPENSES</a>
                 </div>
             </div>
             
@@ -90,7 +90,7 @@
                         <th>Student Name</th>
                         <th>Payables</th>
                         <th>Amount Paid</th>
-                        <th id="remittedByHeader" onclick="toggleRemittedByOptions()">Representative</th>
+                        <th id="remittedByHeader" onclick="toggleRemittedByOptions()">Treasurer</th>
 
 
                     </tr>
@@ -104,9 +104,8 @@
                             <td><%= remittance.studentName %></td>
                             <td><%= remittance.payment %></td>
                             <td><%= remittance.amountPaid %></td>   
-                            <td><%= remittance.representativeName %></td>
-                            
-                            <input type="hidden" name="payable" value="<%= remittance.payment %>">
+                            <td><%= remittance.treasurerName %></td>
+                        
                             <input type="hidden" name="amountPaid" value="<%= remittance.amountPaid %>">
                         </tr>
                         
@@ -134,143 +133,143 @@
         </div>
     </div>
     
-
-<form id="popupForm" class="popup-form" action="/Treasurer_save_fund" method="post" style="display: none;">
-    <div class="popup-content">
-        <span class="close" onclick="closePopup()">&times;</span>
-
-        <div class="remittance-table"> 
-            <h2>REMITTANCE</h2>
+    <form id="popupForm" class="popup-form" action="/treasurer_3A_show_treasurer_save_fund" method="post" style="display: none;">
+        <div class="popup-content">
+            <span class="close" onclick="closePopup()">&times;</span>
             
-            <!-- Hidden Input for yearBlock -->
-            <input type="hidden" name="yearBlock" value="<%= blockKey %>">
-
-            <input type="hidden" name="block" value="<%= block %>">
-
-            <label for="date">Date:</label>
-            <% denominations.forEach(denom => { %>
-                <input type="date" name="date" value="<%= denom.date %>" readonly>
-            <% }) %>
-            
-            <table>
-                <thead>
-                    <tr>
-                        <th class="text">DENOMINATION</th>
-                        <th class="text">AMOUNT</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% denominations.forEach(denom => { %>
+            <div class="remittance-table"> 
+                <h2>REMITTANCE</h2>
+                <span class="span"><%= blockKey %></span>
+                <input type="hidden" name="block" value="<%= block %>">
+                <input type="hidden" name="yearLevel" value="<%= yearLevel %>">
+                
+                <% if (studentRemittances.length > 0) { %>
+                    <input type="hidden" name="payable" value="<%= studentRemittances[0].payment ? studentRemittances[0].payment : '' %>">
+                <% } else { %>
+                    <input type="hidden" name="payable" value="">
+                <% } %>
+                
+                    <label></label>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>DENOMINATION</th>
+                            <th>AMOUNT</th>
+                        </tr>
+                    </thead>
+                    <tbody>
                         <tr>
                             <td>1,000</td>
-                            <td>
-                                <input type="number" 
-                                    name="Amount1000" 
-                                    class="amount-input" 
-                                    data-denomination="1000" 
-                                    min="0" 
-                                    value="<%= denom.Amount1000 %>" 
-                                    onchange="updateCollectedAmount()" required>
-                            </td>
+                            <td><input type="number" class="amount-input" name="Amount1000" data-denomination="1000" min="0"></td>
                         </tr>
                         <tr>
                             <td>500</td>
-                            <td>
-                                <input type="number" 
-                                    name="Amount500" 
-                                    class="amount-input" 
-                                    data-denomination="500" 
-                                    min="0" 
-                                    value="<%= denom.Amount500 %>" 
-                                    onchange="updateCollectedAmount()" required>
-                            </td>
+                            <td><input type="number" class="amount-input" name="Amount500" data-denomination="500" min="0"></td>
                         </tr>
                         <tr>
                             <td>200</td>
-                            <td>
-                                <input type="number" 
-                                    name="Amount200" 
-                                    class="amount-input" 
-                                    data-denomination="200" 
-                                    min="0" 
-                                    value="<%= denom.Amount200 %>" 
-                                    onchange="updateCollectedAmount()" required>
-                            </td>
+                            <td><input type="number" class="amount-input" name="Amount200" data-denomination="200" min="0"></td>
                         </tr>
                         <tr>
                             <td>100</td>
-                            <td>
-                                <input type="number" 
-                                    name="Amount100" 
-                                    class="amount-input" 
-                                    data-denomination="100" 
-                                    min="0" 
-                                    value="<%= denom.Amount100 %>" 
-                                    onchange="updateCollectedAmount()" required>
-                            </td>
+                            <td><input type="number" class="amount-input" name="Amount100" data-denomination="100" min="0"></td>
                         </tr>
                         <tr>
                             <td>50</td>
-                            <td>
-                                <input type="number" 
-                                    name="Amount50" 
-                                    class="amount-input" 
-                                    data-denomination="50" 
-                                    min="0" 
-                                    value="<%= denom.Amount50 %>" 
-                                    onchange="updateCollectedAmount()" required>
-                            </td>
+                            <td><input type="number" class="amount-input" name="Amount50" data-denomination="50" min="0"></td>
                         </tr>
                         <tr>
                             <td>20</td>
-                            <td>
-                                <input type="number" 
-                                    name="Amount20" 
-                                    class="amount-input" 
-                                    data-denomination="20" 
-                                    min="0" 
-                                    value="<%= denom.Amount20 %>" 
-                                    onchange="updateCollectedAmount()" required>
-                            </td>
+                            <td><input type="number" class="amount-input" name="Amount20" data-denomination="20" min="0"></td>
                         </tr>
                         <tr>
-                            <td>Coins</td>
-                            <td>
-                                <input type="number" 
-                                    name="coins" 
-                                    class="amount-input" 
-                                    data-denomination="1" 
-                                    min="0" 
-                                    value="<%= denom.coin %>" 
-                                    onchange="updateCollectedAmount()" required>
-                            </td>
+                            <td>coins</td>
+                            <td><input type="number" class="amount-input" name="coins" data-denomination="1" min="0"></td>
                         </tr>
-                    <% }) %>
-                    <tr>
-                        <td>Total Amount Remitted</td>
-                        <td><%= totalAmountPaid %></td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <p class="Amount">Amount Collected: ₱<span id=""><%= totalAmountPaid %></span></p>
-
-            <% if (studentRemittances.length > 0) { %>
-                <p class="Status"><strong>Status:</strong> <%= studentRemittances[0].status %></p>
-            <% } %>
-
-            <!-- Hidden Input for Total Amount -->
-            <input type="hidden" name="collectedAmount" id="collectedAmountInput">
-
-            <button type="submit" class="submit-btn">Submit Remittance</button>
+                        <tr>
+                            <td>Total Amount Remitted</td>
+                            <td>₱<span id="totalAmount">0.00</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <p class="Amount">Amount Collected: ₱<span id="totalAmountCollected"><%= totalAmountPaid %></span></p>
+                <input type="hidden" name="collectedAmount" value="<%= totalAmountPaid %>">
+                
+                <% if (studentRemittances.length > 0) { %>
+                    <p class="Status"><strong>Status:</strong> <%= studentRemittances[0].status %></p>
+                <% } %>
+               
+    
+                <input type="hidden" name="totalAmountRemitted" value="0">
+    
+                <button type="submit" class="submit-btn">Submit Remittance</button>
+            </div>
         </div>
-    </div>
-</form>
+    </form>
+    
+    
+    
+    <script>
+
+        
+        
+   function calculateTotal() {
+    var amountInputs = document.querySelectorAll('.amount-input');
+    var totalAmount = 0;
+
+    // Calculate the total amount from all input fields
+    amountInputs.forEach(function(input) {
+        var denomination = parseFloat(input.getAttribute('data-denomination'));
+        var amount = parseInt(input.value) || 0; 
+        totalAmount += denomination * amount;
+    });
+
+    // Display the total remitted amount
+    document.getElementById('totalAmount').textContent = totalAmount.toFixed(2);
+    
+
+
+}
+
+// Attach event listener to all amount input fields
+document.querySelectorAll('.amount-input').forEach(function(input) {
+    input.addEventListener('input', calculateTotal);
+});
+
+function toggleDropdown(id) {
+    const dropdown = document.getElementById(id);
+    dropdown.classList.toggle("show");
+}
+
+function openPopup() {
+    document.getElementById("popupForm").style.display = "flex";
+}
+
+function closePopup() {
+    document.getElementById("popupForm").style.display = "none";
+}
+
+// Function to check if "Amount Collected" matches "Total Amount Remitted"
+function checkAmounts() {
+    const collectedAmount = parseFloat(document.getElementById("collectedAmount").textContent.trim());
+    const totalAmount = parseFloat(document.getElementById("totalAmount").textContent.trim());
+
+    const receiveButton = document.getElementById("receiveButton");
+
+    // Enable the button only if the amounts match
+    if (collectedAmount === totalAmount) {
+        receiveButton.disabled = false;
+    } else {
+        receiveButton.disabled = true;
+    }
+}
+
+    </script>
 
 
     <script>
-
-
 
         // Dropdown for "Remitted by"
         function toggleRemittedByOptions() {
@@ -304,7 +303,6 @@
         }
     </script>
     
-    <!-- Dropdown Menu -->
     <div id="remittedByDropdown" class="dropdown-menu" style="display: none; position: absolute; z-index: 100;">
         <ul style="list-style-type: none; margin: 0; padding: 0; background: #fff; border: 1px solid #ddd; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
             <li style="padding: 8px 16px; cursor: pointer;"><a href="/Treasurer_3<%= block %>_verified_remittance" style="text-decoration: none; color: inherit;">Treasurer</a></li>
@@ -312,7 +310,6 @@
             
         </ul>
     </div>
-    
 
     <script>
         var block = "3A"; 
@@ -320,7 +317,7 @@
 
         var block = "3A"; 
         document.getElementById("verify-link").href = "/Treasurer_" + block + "_verify_remittance";
-    </script>
+      </script>
         
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>

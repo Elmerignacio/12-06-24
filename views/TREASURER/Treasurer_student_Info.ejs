@@ -32,8 +32,7 @@
 
 .archive-modal .form-actions {
     display: flex;
-    justify-content: space-between; /* Space out the buttons */
-    align-items: center; /* Vertically align the buttons */
+    justify-content: space-between; 
 }
 
 .archive-modal .form-actions button {
@@ -43,14 +42,65 @@
 }
 
 .archive-modal .form-actions button:nth-child(1) {
-    background-color: #4CAF50; /* Green for Yes */
+    background-color: #4CAF50;
     color: white;
 }
 
 .archive-modal .form-actions button:nth-child(2) {
-    background-color: #f44336; /* Red for No */
+    background-color: #f44336; 
     color: white;
 }
+
+.notification {
+    position: fixed;
+    top: -100px; 
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #f44336; 
+    color: white;
+    padding: 15px 20px;
+    border-radius: 4px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    transition: top 0.5s ease; 
+    z-index: 1000;
+}
+
+.notification.success {
+    background-color: #4CAF50; 
+}
+
+.notification.error {
+    background-color: #f44336; 
+}
+
+.notification.show {
+    top: 20px; 
+}
+
+.notification.dismiss {
+    top: -100px; 
+}
+
+.notification p {
+    margin: 0;
+    padding: 0;
+    font-size: 16px;
+}
+
+.notification .close-btn {
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    background: none;
+    border: none;
+}
+.close-btn {
+   margin-right: 10px;
+}
+
+
+
 
 
     </style>
@@ -101,7 +151,7 @@
         <span class="arrow"></span>
         <div class="dropdown-content" id="reportDropdown">
           <a href="#">MONTHLY REPORT</a>
-          <a href="#">EXPENSES</a>
+          <a href="/treasurer_create_expenses">EXPENSES</a>
         </div>
       </div>
       
@@ -123,10 +173,12 @@
     
     <% if (typeof message !== 'undefined') { %>
         <div class="notification <%= messageType === 'success' ? 'success' : 'error' %>" id="notification">
-            <p><%= message %></p>
+            <div style="display: flex;">
+                <span class="close-btn" onclick="dismissNotification()">×</span>
+                <p><%= message %></p>
+            </div>
         </div>
     <% } %>
-    
     
 
 <div class="container">
@@ -261,8 +313,9 @@
                     <div class="gender-field">
                         <label for="edit-gender">Gender:</label>
                         <select id="edit-gender" name="gender">
-                            <option value="Male" <%= student.gender === 'Male' ? 'selected' : '' %>>MALE</option>
-                            <option value="Female" <%= student.gender === 'Female' ? 'selected' : '' %>>FEMALE</option>
+                            <option value="Male" <%= student.gender.toUpperCase() === 'MALE' ? 'selected' : '' %>>MALE</option>
+                            <option value="Female" <%= student.gender.toUpperCase() === 'FEMALE' ? 'selected' : '' %>>FEMALE</option>
+                            
                         </select>
                     </div>
     
@@ -303,7 +356,6 @@
     </div>
     
     
-
     <div id="archive-modal" class="archive-modal" style="display:none;">
         <div class="modal-content">
             <span class="close" onclick="closeArchiveModal()">&times;</span>
@@ -318,10 +370,32 @@
             </form>
         </div>
     </div>
-
-
+    
     <script>
-   
+    //message
+    document.addEventListener("DOMContentLoaded", () => {
+        const notification = document.getElementById("notification");
+        if (notification) {
+            setTimeout(() => {
+                notification.classList.add("show");
+            }, 100);
+
+            setTimeout(() => {
+                dismissNotification();
+            }, 5000);
+        }
+    });
+
+    function dismissNotification() {
+        const notification = document.getElementById("notification");
+        if (notification) {
+            notification.classList.add("dismiss");
+            notification.addEventListener("transitionend", () => {
+                notification.remove();
+            });
+        }
+    }
+
 
 
         function openEditModal() {

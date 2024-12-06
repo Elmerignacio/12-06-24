@@ -15,6 +15,8 @@ module.exports = (sequelize, DataTypes) => {
   }
   denomination.init({
     date: DataTypes.DATEONLY,
+    yearLevel: DataTypes.INTEGER,
+    block: DataTypes.STRING,
     Amount1000: DataTypes.INTEGER,
     Amount500: DataTypes.INTEGER,
     Amount200: DataTypes.INTEGER,

@@ -86,25 +86,26 @@ Treasurer_route.post(
     Treasurer_controller.updateStudent
 );
 
+
 Treasurer_route.post(
     '/Treasurer_archieve',
     middleware.authenticateJWT,
     middleware.authorizeRole('TREASURER'),
-    Treasurer_controller.Treasurer_archieve_student
+    Treasurer_controller.Treasurer_archieve 
 );
 
 Treasurer_route.post(
     '/Treasurer_display_archive',
     middleware.authenticateJWT,
     middleware.authorizeRole('TREASURER'),
-    Treasurer_controller.Treasurer_display_archive
+    Treasurer_controller.Treasurer_display_archive 
 );
 
 Treasurer_route.get(
-    '/Treasurer_archieve',
+    '/Treasurer_archieve', 
     middleware.authenticateJWT,
     middleware.authorizeRole('TREASURER'),
-    Treasurer_controller.Treasurer_archieve
+    Treasurer_controller.Treasurer_archieve_student
 );
 
 Treasurer_route.post(
@@ -115,11 +116,10 @@ Treasurer_route.post(
 );
 
 
-// Shared or General Routes
 Treasurer_route.get(
     '/Treasurer_funds',
     middleware.authenticateJWT,
-    middleware.authorizeRole('TREASURER', 'representative'),
+    middleware.authorizeRole('TREASURER'),
     Treasurer_controller.Treasurer_fund
 );
 
@@ -131,6 +131,63 @@ Treasurer_route.post(
 );
 
 Treasurer_route.get('/students',middleware.authenticateJWT,middleware.authorizeRole('TREASURER'),Treasurer_controller.student)
+
+Treasurer_route.get(
+    '/Treasurer_3A_verified_remittance',
+    middleware.authenticateJWT,
+    middleware.authorizeRole('TREASURER'),
+    Treasurer_controller.Treasurer_3A_verified_remittance
+);
+Treasurer_route.get(
+    '/Treasurer_3B_verified_remittance',
+    middleware.authenticateJWT,
+    middleware.authorizeRole('TREASURER'),
+    Treasurer_controller.Treasurer_3B_verified_remittance
+);
+
+
+Treasurer_route.post(
+    '/treasurer_3A_show_treasurer_save_fund',
+    middleware.authenticateJWT,
+    middleware.authorizeRole('TREASURER'),
+    Treasurer_controller.treasurer_3A_show_treasurer_save_fund
+);
+
+Treasurer_route.get(
+    '/Treasurer_create_expenses',
+    middleware.authenticateJWT,
+    middleware.authorizeRole('TREASURER'),
+    Treasurer_controller.Treasurer_display_expenses
+);
+
+
+Treasurer_route.post(
+    '/treasurer_create_expenses',
+    middleware.authenticateJWT,
+    middleware.authorizeRole('TREASURER'),
+    Treasurer_controller.treasurer_create_expenses
+);
+
+Treasurer_route.get(
+    '/Treasurer_view_expense',
+    middleware.authenticateJWT,
+    middleware.authorizeRole('TREASURER'),
+    Treasurer_controller.Treasurer_view_expense
+);
+
+Treasurer_route.get(
+    '/Treasurer_receivable',
+    middleware.authenticateJWT,
+    middleware.authorizeRole('TREASURER'),
+    Treasurer_controller.Treasurer_receivable
+);
+
+Treasurer_route.get(
+    '/Treasurer_expenses',
+    middleware.authenticateJWT,
+    middleware.authorizeRole('TREASURER'),
+    Treasurer_controller.Treasurer_expenses
+);
 
 
 

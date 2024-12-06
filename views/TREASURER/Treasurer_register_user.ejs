@@ -9,23 +9,58 @@
 
     </head>
     <style>
-             .notification {
-            padding: 15px;
-            margin: 19px;
-            border-radius: 5px;
-            text-align: center;
-    }
+        
+.notification {
+    position: fixed;
+    top: -100px; 
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #f44336; 
+    color: white;
+    padding: 15px 20px;
+    border-radius: 4px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    transition: top 0.5s ease; 
+    z-index: 1000;
+}
 
-    .success {
-        background-color: #4CAF50;
-        color: white;
-    }
+.notification.success {
+    background-color: #4CAF50; 
+}
 
-    .error {
-        background-color: #f44336; 
-        color: white;
-    }
+.notification.error {
+    background-color: #f44336; 
+}
 
+.notification.show {
+    top: 20px; 
+}
+
+.notification.dismiss {
+    top: -100px; 
+}
+
+.notification p {
+    margin: 0;
+    padding: 0;
+    font-size: 16px;
+}
+
+.notification .close-btn {
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    background: none;
+    border: none;
+}
+.close-btn {
+   margin-right: 10px;
+}
+
+
+
+     
 
     </style>
     <body>
@@ -74,7 +109,7 @@
             <span class="arrow"></span>
             <div class="dropdown-content" id="reportDropdown">
               <a href="#">MONTHLY REPORT</a>
-              <a href="#">EXPENSES</a>
+              <a href="/treasurer_create_expenses">EXPENSES</a>
             </div>
           </div>
           
@@ -97,7 +132,11 @@
 
         <% if (typeof message !== 'undefined') { %>
             <div class="notification <%= message.type === 'success' ? 'success' : 'error' %>" id="notification">
-                <p><%= message.text %></p>
+                <div style="display: flex;">
+                    <span class="close-btn" onclick="dismissNotification()">×</span>
+                    <p><%= message.text %></p>
+                </div>
+            
             </div>
         <% } %>
         
@@ -143,6 +182,30 @@
             </form>
         </div>
 
+        <script>
+                document.addEventListener("DOMContentLoaded", () => {
+        const notification = document.getElementById("notification");
+        if (notification) {
+            setTimeout(() => {
+                notification.classList.add("show");
+            }, 100);
+
+            setTimeout(() => {
+                dismissNotification();
+            }, 5000);
+        }
+    });
+
+    function dismissNotification() {
+        const notification = document.getElementById("notification");
+        if (notification) {
+            notification.classList.add("dismiss");
+            notification.addEventListener("transitionend", () => {
+                notification.remove();
+            });
+        }
+    }
+        </script>
         <script src="/TREASURER_JS/Treasurer_register_user.js" ></script>
     </body>
     </html>

@@ -104,11 +104,11 @@
         .flex2 {
     font-size: 19px;
     font-weight: bold;
-    text-align: center;
-    width: 150%;  
+    text-align: center; /* Center the text horizontally */
+    width: 150%;  /* Ensure it takes up the full width for proper centering */
     margin: 0 auto;
     margin-right: 130px;
-
+ /* Optional: auto margins to ensure centering */
 }
 
 
@@ -145,8 +145,8 @@
 
         @media print {
     @page {
-        size: 8.5in 11in; 
-        margin: 10mm; 
+        size: 8.5in 11in;  /* 8.5 x 11 inches for standard paper size */
+        margin: 10mm;  /* Adjust margins to ensure content fits well on paper */
     }
 
     body {
@@ -155,11 +155,11 @@
         margin: 0;
         padding: 0;
         background-color: white;
-        text-align: center; 
+        text-align: center; /* Center all text and elements */
     }
 
     .actions {
-        display: none; 
+        display: none; /* Hide actions like the print button during printing */
     }
 
     .fund-table {
@@ -170,7 +170,7 @@
 
     .fund-table th, .fund-table td {
         border: 1px solid black;
-        padding: 8px; 
+        padding: 8px;  /* Consistent padding */
         text-align: center;
         font-size: 12pt;
     }
@@ -188,13 +188,13 @@
     .flex, .flex2 {
         display: block;
         width: 100%;
-        text-align: center; 
+        text-align: center;  /* Center all content inside flex and flex2 */
     }
 
     .BSIT {
         display: block;
         margin: 0 auto;
-        width: 250px;  
+        width: 250px;  /* Adjust the logo size if needed */
         height: auto;
     }
 
@@ -205,7 +205,7 @@
     .date-filters {
         display: block;
         margin: 10px 0;
-        text-align: center;  
+        text-align: center;  /* Center the date filters */
     }
 
     .date-filters input[type="date"] {
@@ -214,12 +214,12 @@
     }
 
     .print-btn {
-        display: none;  
+        display: none;  /* Hide print button during printing */
     }
 
     .flex {
         display: block;
-        text-align: center;  
+        text-align: center;  /* Center everything inside flex */
         margin-bottom: 3%;
     }
 
@@ -231,7 +231,7 @@
 
         .date-filters {
     display: flex;
-    justify-content: flex-start; 
+    justify-content: flex-start; /* Align items to the left */
     margin-bottom: 20px;
     gap: 10px;
 }
@@ -240,51 +240,6 @@
     padding: 5px;
     font-size: 16px;
 }
-/* Style for table rows and cells */
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-td {
-  padding: 8px;
-  text-align: center;
-  border: 1px solid #ccc;
-}
-
-.total-receive {
-  background-color: #f0f8ff; 
-  font-weight: bold;
-}
-
-.total-expenses {
-  background-color: #ffebcd; 
-  font-weight: bold;
-}
-
-.cash-on-hand {
-  background-color: #d3ffd3;
-  font-weight: bold;
-}
-
-.total-value {
-  color: #000;
-  font-size: 1rem;
-}
-
-td:not(:first-child):empty {
-  background-color: #f8d7da; 
-}
-
-td.total-value {
-  font-size: 1.1rem;
-  color: #333;
-}
-p {
-        text-align: left;
-    }
-
-
 
     </style>
 </head>
@@ -294,17 +249,15 @@ p {
     
         <div class="flex2">
             <strong class="inline">BACHELOR OF SCIENCE IN INFORMATION TECHNOLOGY</strong><br>
-            <strong>MONTHLY DUES REPORT</strong><br>
+            <strong>MONTHLY RECEIVABLE</strong><br>
         </div>
     </div>
     
     <span class="date-filters">
-        <p><strong>From:</strong>
-            <input type="date" id="fromDatePicker" name="fromDate" required />
-        </p>
-        <p><strong>To:</strong>
-            <input type="date" id="toDatePicker" name="toDate" required />
-        </p>
+        <strong>From</strong> 
+        <input class="form" type="date" id="startDate" value="2024-12-01">
+        <strong>To</strong> 
+        <input class="form" type="date" id="endDate" value="2024-12-31">
     </span>
     
     <table class="fund-table">
@@ -320,16 +273,18 @@ p {
             <% const totals = {}; %>
             <% for (const key in groupedData) { %>
                 <tr>
-                    <td data-date="<%= groupedData[key].date %>">
+                    <td>
                         <a href="/Treasurer_BSIT_<%= key.replace(/\s+/g, '').toUpperCase() %>_remittance" class="clickable-year-block">
                             <%= key %>
                         </a>
                     </td>
                     <% allPayables.forEach(payable => { %>
                         <td>
-                            <% if (groupedData[key][payable]) { %>
+                            <% if (groupedData[key] && groupedData[key][payable]) { %>
                                 ₱ <%= Math.floor(groupedData[key][payable]) %>
                                 <% totals[payable] = (totals[payable] || 0) + Math.floor(groupedData[key][payable]); %>
+                            <% } else { %>
+                                
                             <% } %>
                         </td>
                     <% }) %>
@@ -338,66 +293,30 @@ p {
         </tbody>
         <tfoot>
             <tr>
-                <td class="total-receive">TOTAL RECEIVE</td>
+                <td>Total</td>
                 <% allPayables.forEach(payable => { %>
-                  <td class="total-receive">
-                    <% if (totals[payable] > 0) { %>
-                      ₱ <%= Math.floor(totals[payable]) %>
-                    <% } else { %>
-                    <% } %>
-                  </td>
+                    <td>
+                        <% if (totals[payable] > 0) { %>
+                            ₱ <%= Math.floor(totals[payable]) %>
+                        <% } else { %>
+                        <% } %>
+                    </td>
                 <% }) %>
-              </tr>
-              
-              <tr>
-                <td class="total-expenses">TOTAL EXPENSES</td>
-                <% allPayables.forEach(payable => { %>
-                  <td class="total-expenses">
-                    <% if (totalExpenses[payable] > 0) { %>
-                      ₱ <%= Math.floor(totalExpenses[payable]) %>
-                    <% } else { %>
-                    <% } %>
-                  </td>
-                <% }) %>
-              </tr>
-              
-              <tr>
-                <td class="cash-on-hand">CASH ON HAND</td>
-                <% allPayables.forEach(payable => { %>
-                  <td class="cash-on-hand">
-                    <% let cashOnHand = Math.floor(totals[payable] - (totalExpenses[payable] || 0)); %>
-                    <% if (cashOnHand > 0) { %>
-                      ₱ <%= cashOnHand %>
-                    <% } else { %>
-                        0
-                    <% } %>
-                  </td>
-                <% }) %>
-              </tr>
+            </tr>
         </tfoot>
-
     </table>
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
 
-        <div style="display: inline-block; margin-top: 10px;">
-            <p><strong>TOTAL AMOUNT RECEIVE: </strong> <strong>₱ <%= Math.floor(Object.values(totals).reduce((acc, val) => acc + val, 0)) %></strong> </p>
-            <p><strong>TOTAL EXPENSES: </strong> <strong>₱ <%= Math.floor(Object.values(totalExpenses).reduce((acc, val) => acc + val, 0)) %></strong></p>
-            <p><strong>CASH ON HAND: </strong> <strong>₱ <%= Math.floor(Object.values(totals).reduce((acc, val) => acc + val, 0)) - Math.floor(Object.values(totalExpenses).reduce((acc, val) => acc + val, 0)) %></strong></p>
-        </div>
-    
-        <div class="actions" style="display: flex; gap: 10px; align-items: center; margin-left: auto;">
-            <a href="/Treasurer_dashboard" class="no-underline dashboard-btn">Dashboard</a>
-            <a href="javascript:window.print();" class="no-underline print-btn">Print</a>
-        </div>
-    
+<div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+    <div style="text-align: left; padding-left: 20px;">
+        <strong>TOTAL RECEIVABLE :</strong>
+        <strong class="totalR"> ₱ <%= Math.floor(totalReceivable) %></strong>
     </div>
-    
-    
 
-
- 
-    
-
+    <div class="actions" style="display: flex; gap: 10px; align-items: center;">
+        <a href="/Treasurer_dashboard" class="no-underline dashboard-btn">Dashboard</a>
+        <a href="javascript:window.print();" class="no-underline print-btn">Print</a>
+    </div>
+</div>
 
 </body>
 </html>

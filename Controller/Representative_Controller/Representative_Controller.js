@@ -386,7 +386,6 @@ const Representative_3A_verify_remittance = (req, res) => {
         model.remittance.findAll() 
     ])
     .then(([users, remittances]) => {  
-        // Filter for block A students only
         const filteredStudents = users.filter(user =>
             user.role === 'STUDENT' &&
             user.yearLevel === '3' &&
@@ -396,53 +395,54 @@ const Representative_3A_verify_remittance = (req, res) => {
         const representatives = users.filter(user => user.role === 'REPRESENTATIVE');
         const treasurer = users.find(user => user.role === 'TREASURER'); 
 
-        // Logging representatives and treasurer for debugging
         console.log("Representatives:", representatives);
         console.log("Treasurer:", treasurer); 
 
-        // Map remittances and filter for block A
         const studentRemittances = remittances.map(remittance => {
-            const student = users.find(user => `${user.firstName} ${user.lastName}` === remittance.student);
+            const student = users.find(user => user.firstName + ' ' + user.lastName === remittance.student);
             
             console.log("Checking Remittance:", remittance);
 
-            // Ensure only block A students are included, and status is not 'received'
-            if (student && student.block === 'A' && remittance.status.trim().toLowerCase() !== 'received') {  
+            if (student && student.block === 'A' && 
+                remittance.status.trim().toLowerCase() !== 'remitted' && 
+                remittance.status.trim().toLowerCase() !== 'verified') {  // Exclude 'received' and 'verified' status
                 const representative = representatives.find(rep => rep.block === student.block && rep.yearLevel === student.yearLevel);
-                
-                // If block and year level do not match, set status to "pending"
-                const status = (student.block === remittance.block && student.yearLevel === remittance.yearLevel) 
-                    ? 'received' 
-                    : 'pending';
 
-                return {
-                    studentName: remittance.student,
-                    payment: remittance.payables,
-                    amountPaid: remittance.paid,
-                    balances: remittance.balances,
-                    date: remittance.date,
-                    block: student.block,
-                    remittedBy: remittance.remittedBy || 'N/A', 
-                    representativeName: representative ? `${representative.firstName} ${representative.lastName}` : 'N/A',
-                    treasurerName: treasurer ? `${treasurer.firstName} ${treasurer.lastName}` : 'N/A',
-                    status: status,  // Set status to "pending" or "received"
-                    paid: remittance.paid    
-                };
+                // Only include if a representative processed the remittance
+                if (representative && remittance.remittedBy === representative.firstName + ' ' + representative.lastName) {
+                    const remittanceData = {
+                        studentName: remittance.student,
+                        payment: remittance.payables,
+                        amountPaid: remittance.paid,
+                        balances: remittance.balances,
+                        block: student.block,
+                        remittedBy: remittance.remittedBy || 'N/A', 
+                        representativeName: representative ? `${representative.firstName} ${representative.lastName}` : 'N/A',
+                        treasurerName: treasurer ? `${treasurer.firstName} ${treasurer.lastName}` : 'N/A',
+                        status: remittance.status,  
+                        paid: remittance.paid    
+                    };
+
+                    // Add the date only if the status is not 'received' or 'verified'
+                    if (remittance.status.trim().toLowerCase() !== 'remitted' && remittance.status.trim().toLowerCase() !== 'verified') {
+                        remittanceData.date = remittance.date;
+                    }
+
+                    return remittanceData;
+                }
             }
-        }).filter(remittance => remittance);  // Filter out any undefined remittance
+        }).filter(remittance => remittance);  
 
         console.log("Filtered Student Remittances:", studentRemittances); 
 
-        // Extract representative names for block A
         const representativeNames = representatives
             .filter(rep => rep.block === 'A')
             .map(representative => `${representative.firstName} ${representative.lastName}`);
 
-        // Render the page with the filtered remittances for block A
         res.render("Representative_verify_remittance", {
             blockKey: 'BSIT - 3A',
             yearLevel: '3',
-            block: 'A',
+            block:'A',
             studentRemittances,
             representativeNames,
             filteredStudents,
@@ -451,55 +451,6 @@ const Representative_3A_verify_remittance = (req, res) => {
     .catch(error => {
         console.error(error);
         res.status(500).render("error", { message: "Unable to retrieve data" });
-    });
-};
-
-// Handling the 'Receive' action and ensuring only block A remittances can be received
-const handleReceiveRemittance = (req, res) => {
-    const remittanceId = req.body.remittanceId;
-    const studentId = req.body.studentId;
-    
-    // Fetch the remittance record by ID
-    model.remittance.findOne({
-        where: { id: remittanceId }
-    })
-    .then(remittance => {
-        if (!remittance) {
-            return res.status(404).send({ message: 'Remittance not found' });
-        }
-
-        // Check if the student is from block A
-        model.register_user.findOne({
-            where: { id: studentId }
-        })
-        .then(student => {
-            if (student.block !== 'A') {
-                return res.status(400).send({ message: 'Only block A remittances can be received.' });
-            }
-
-            // If block and year level match, set status to 'received', otherwise set it to 'pending'
-            const status = (student.block === remittance.block && student.yearLevel === remittance.yearLevel)
-                ? 'received'
-                : 'pending';
-
-            // Update the remittance status based on the block and year level check
-            remittance.update({ status: status })
-                .then(() => {
-                    res.send({ message: `Remittance status updated to ${status} successfully.` });
-                })
-                .catch(error => {
-                    console.error(error);
-                    res.status(500).send({ message: 'Error updating remittance status' });
-                });
-        })
-        .catch(error => {
-            console.error(error);
-            res.status(500).send({ message: 'Error retrieving student information' });
-        });
-    })
-    .catch(error => {
-        console.error(error);
-        res.status(500).send({ message: 'Error retrieving remittance data' });
     });
 };
 
@@ -529,15 +480,17 @@ const Representative_3B_verify_remittance = (req, res) => {
             
             console.log("Checking Remittance:", remittance);
 
-            if (student && student.block === 'B' && remittance.status.trim().toLowerCase() !== 'received') {  
+            if (student && student.block === 'B' && 
+                remittance.status.trim().toLowerCase() !== 'remitted' && 
+                remittance.status.trim().toLowerCase() !== 'verified') {  
                 const representative = representatives.find(rep => rep.block === student.block && rep.yearLevel === student.yearLevel);
-                
-                return {
+
+                // Include the date only if the status is not 'received' or 'receivedByTreasurer'
+                const remittanceData = {
                     studentName: remittance.student,
                     payment: remittance.payables,
                     amountPaid: remittance.paid,
                     balances: remittance.balances,
-                    date: remittance.date,
                     block: student.block,
                     remittedBy: remittance.remittedBy || 'N/A', 
                     representativeName: representative ? `${representative.firstName} ${representative.lastName}` : 'N/A',
@@ -545,13 +498,20 @@ const Representative_3B_verify_remittance = (req, res) => {
                     status: remittance.status,  
                     paid: remittance.paid    
                 };
+
+                // Add the date only if the status is not 'received' or 'receivedByTreasurer'
+                if (remittance.status.trim().toLowerCase() !== 'remitted' && remittance.status.trim().toLowerCase() !== 'verified') {
+                    remittanceData.date = remittance.date;
+                }
+
+                return remittanceData;
             }
         }).filter(remittance => remittance);  
 
         console.log("Filtered Student Remittances:", studentRemittances); 
 
         const representativeNames = representatives
-            .filter(rep => rep.block === 'A')
+            .filter(rep => rep.block === 'B')
             .map(representative => `${representative.firstName} ${representative.lastName}`);
 
         res.render("Representative_verify_remittance", {
@@ -569,70 +529,72 @@ const Representative_3B_verify_remittance = (req, res) => {
     });
 };
 
-const Representative_save_fund = (req, res) => {
-    const { Receive, date, Amount1000, Amount500, Amount200, Amount100, Amount50, Amount20, coin } = req.body;
 
-    if (Receive && date) {
-        // First, update the remittance status
+const Representative_save_fund = (req, res) => {
+    const { Receive, date, Amount1000, Amount500, Amount200, Amount100, Amount50, Amount20, coin, block, yearLevel } = req.body;
+
+    if (Receive && date && block) {
+        // Update the remittance status for the specified block
         model.remittance.update(
-            { 
-                status: 'Received',  
-                date: date         
+            {
+                status: 'Remitted',
+                date: date
             },
             {
                 where: {
-                    status: 'Pending'  
+                    status: 'Pending',
+                    block: block,
+                    yearLevel:yearLevel
                 }
-            })
-            .then(() => {
-                // Check if a record with the same date already exists in the denomination table
-                return model.denomination.findOne({
-                    where: { date: date }
-                });
-            })
-            .then(existingRecord => {
-                if (existingRecord) {
-                    // If record exists, add the new amounts to the existing ones (ensure they are numbers)
-                    return existingRecord.update({
-                        Amount1000: (Number(existingRecord.Amount1000) || 0) + (Number(Amount1000) || 0),
-                        Amount500: (Number(existingRecord.Amount500) || 0) + (Number(Amount500) || 0),
-                        Amount200: (Number(existingRecord.Amount200) || 0) + (Number(Amount200) || 0),
-                        Amount100: (Number(existingRecord.Amount100) || 0) + (Number(Amount100) || 0),
-                        Amount50: (Number(existingRecord.Amount50) || 0) + (Number(Amount50) || 0),
-                        Amount20: (Number(existingRecord.Amount20) || 0) + (Number(Amount20) || 0),
-                        coin: (Number(existingRecord.coin) || 0) + (Number(coin) || 0)
-                    });
-                } else {
-                    // If no record exists, create a new one
-                    return model.denomination.create({
-                        date: date,
-                        Amount1000: Number(Amount1000) || 0,
-                        Amount500: Number(Amount500) || 0,
-                        Amount200: Number(Amount200) || 0,
-                        Amount100: Number(Amount100) || 0,
-                        Amount50: Number(Amount50) || 0,
-                        Amount20: Number(Amount20) || 0,
-                        coin: Number(coin) || 0
-                    });
-                }
-            })
-            .then(() => {
-                // Redirect after both operations are successful
-                res.redirect('/Representative_3A_verify_remittance');
-            })
-            .catch(err => {
-                console.error(err);
-                res.status(500).send("Error updating the remittance status or saving denomination data");
+            }
+        )
+        .then(() => {
+            return model.denomination.findOne({
+                where: { date: date, block: block , yearLevel: yearLevel } 
             });
+        })
+        .then(existingRecord => {
+            if (existingRecord) {
+                return existingRecord.update({
+                    Amount1000: (Number(existingRecord.Amount1000) || 0) + (Number(Amount1000) || 0),
+                    Amount500: (Number(existingRecord.Amount500) || 0) + (Number(Amount500) || 0),
+                    Amount200: (Number(existingRecord.Amount200) || 0) + (Number(Amount200) || 0),
+                    Amount100: (Number(existingRecord.Amount100) || 0) + (Number(Amount100) || 0),
+                    Amount50: (Number(existingRecord.Amount50) || 0) + (Number(Amount50) || 0),
+                    Amount20: (Number(existingRecord.Amount20) || 0) + (Number(Amount20) || 0),
+                    coin: (Number(existingRecord.coin) || 0) + (Number(coin) || 0)
+                });
+            } else {
+                return model.denomination.create({
+                    date: date,
+                    block: block,
+                    yearLevel:yearLevel,
+                    Amount1000: Number(Amount1000) || 0,
+                    Amount500: Number(Amount500) || 0,
+                    Amount200: Number(Amount200) || 0,
+                    Amount100: Number(Amount100) || 0,
+                    Amount50: Number(Amount50) || 0,
+                    Amount20: Number(Amount20) || 0,
+                    coin: Number(coin) || 0
+                });
+            }
+        })
+        .then(() => {
+            res.redirect(`/Representative_3${block}_verify_remittance`); 
+        })
+        .catch(err => {
+            console.error(err);
+            res.status(500).send("Error updating the remittance status or saving denomination data");
+        });
     } else {
-        res.status(400).send("Invalid form submission");
+        res.status(400).send("Invalid form submission or missing block information.");
     }
 };
 
 
+
 module.exports = {
     
-    //representative
     Representative_dashboard,
     Display_BSIT_3A,
     Representative_3A_verify_remittance,

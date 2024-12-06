@@ -76,7 +76,7 @@ h1 {
 </style>
 <body>
     <div class="container">
-        <a href="/treasurer_3A_verify_remittance">Back</a>
+        <a href="/treasurer_dashboard">Back</a>
         <h1 class="head1">Archived Students</h1>
         <table class="student-table">
           <thead>
@@ -87,7 +87,6 @@ h1 {
               <th>Year Level</th>
               <th>Block</th>
               <th>Gender</th>
-              <th>Role</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -101,7 +100,6 @@ h1 {
                   <td><%= student.yearLevel %></td>
                   <td><%= student.block %></td>
                   <td><%= student.gender %></td>
-                  <td><%= student.role %></td> <!-- Added Role -->
                   <td>
                     <form method="POST" action="/Treasurer_display_archive">
                       <input type="hidden" name="userId" value="<%= student.userId %>">
@@ -112,8 +110,7 @@ h1 {
               <% }); %>
             <% } else { %>
               <tr>
-                <td colspan="8">No archived students found.</td> <!-- Adjusted colspan -->
-              </tr>
+                <td colspan="8">No archived students found.</td> 
             <% } %>
           </tbody>
         </table>

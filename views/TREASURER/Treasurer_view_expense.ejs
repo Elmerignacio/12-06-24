@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Treasurer Remittance</title>
+    <link rel="stylesheet" href="/TREASURER_CSS/Treasurer_create_expenses.css">  
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css">      
+</head>
+
+<style>
+    .input-field {
+        border: none;
+        outline: none;
+        padding: 5px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .input-field::placeholder {
+        color: #999;
+        opacity: 1; /* Firefox */
+    }
+
+    .input-field:-ms-input-placeholder { /* Internet Explorer 10-11 */
+        color: #999;
+    }
+
+    .input-field::-ms-input-placeholder { /* Microsoft Edge */
+        color: #999;
+    }
+
+    #budgetSource {
+    width: 100%;  /* Adjust width to fit container */
+    padding: 8px; /* Add padding for better spacing */
+    border: 1px solid #ccc; /* Add border with light color */
+    border-radius: 5px; /* Round corners */
+    font-size: 16px; /* Set font size */
+    background-color: #f9f9f9; /* Light background color */
+    color: #333; /* Text color */
+    cursor: pointer; /* Change cursor on hover */
+}
+
+#budgetSource option {
+    padding: 10px; /* Add padding for each option */
+    background-color: #fff; /* Option background color */
+    color: #333; /* Option text color */
+}
+
+#budgetSource:focus {
+    border-color: #007bff; /* Highlight border on focus */
+    outline: none; /* Remove default outline */
+}
+
+#budgetSource option:hover {
+    background-color: #f1f1f1; /* Change background on hover */
+}
+#datePicker {
+  
+    padding: 7px; /* Add padding for better spacing */
+    border: 1px solid #ccc; /* Add border with light color */
+    border-radius: 5px; /* Round corners */
+    font-size: 16px; /* Set font size */
+    background-color: #f9f9f9; /* Light background color */
+    color: #333; /* Text color */
+    cursor: pointer; /* Change cursor on hover */
+    
+}
+
+.date-filters {
+    display: flex;
+    justify-content: flex-start; 
+    margin-bottom: 10px;
+    gap: 10px;
+}
+
+.date-filters input[type="date"] {
+    padding: 5px;
+    font-size: 16px;
+}
+    
+
+</style>
+<body>
+    <header>
+        <div class="logo">
+            <img src="/BSIT_LOGO.png" alt="Logo">
+            <span class="BS">BSIT FUND COLLECTION<br><span class="IT"> MANAGEMENT SYSTEM</span></span>
+        </div>
+        <nav class="nav">
+            <a href="/Treasurer_dashboard" class="nav-link" id="dashboardLink">DASHBOARD</a>
+            <a href="/Treasurer_create_payable" class="nav-link" id="payableLink">PAYABLE</a>
+            
+        <div class="dropdown">
+    <a href="#" class="dropbtn nav-link" id="receiveLink">RECEIVE</a>
+    <span class="arrow"></span>
+    <div class="dropdown-content" id="receiveDropdown">
+        <a href="#">BSIT-1A</a>
+        <a href="#">BSIT-1B</a>
+        <a href="#">BSIT-2A</a>
+        <a href="#">BSIT-2B</a>
+        <a href="/Treasurer_BSIT_3A_remittance">BSIT-3A</a>
+        <a href="/Treasurer_BSIT_3B_remittance">BSIT-3B</a>
+        <a href="#">BSIT-4A</a>
+        <a href="#">BSIT-4B</a>
+          </div>
+      </div>
+    
+          
+      <div class="dropdown">
+        <a href="#" class="dropbtn nav-link" id="remittanceLink">REMITTANCE</a>
+        <span class="arrow"></span>
+        <div class="dropdown-content" id="remittanceDropdown">
+            <a href="#">BSIT-1A</a>
+            <a href="#">BSIT-1B</a>
+            <a href="#">BSIT-2A</a>
+            <a href="#">BSIT-2B</a>
+            <a href="/treasurer_3A_verify_remittance">BSIT-3A</a>
+            <a href="/treasurer_3B_verify_remittance">BSIT-3B</a>
+            <a href="#">BSIT-4A</a>
+            <a href="#">BSIT-4B</a>
+        </div>
+    </div>
+    
+    <div class="dropdown">
+        <a href="#" class="dropbtn nav-link" id="reportLink">REPORT</a>
+        <span class="arrow"></span>
+        <div class="dropdown-content" id="reportDropdown">
+          <a href="#">MONTHLY REPORT</a>
+          <a href="#">EXPENSES</a>
+        </div>
+      </div>
+      
+    <a href="/Treasurer_register_user" class="nav-link" id="registerLink">REGISTER</a>
+           
+    <div class="dropdown">
+    <a href="#" class="dropbtn nav-link" id="userLink" onclick="toggleDropdown('userDropdown')">
+      <i class="fa-solid fa-user"></i>
+    </a>
+    <span class="arrow" onclick="toggleDropdown('userDropdown')"></span>
+    <div class="dropdown-content" id="userDropdown">
+      <a href="#">MANAGE ACCOUNT</a>
+      <a href="/logout">LOGOUT</a>
+    </div>
+    </div>
+    
+        </nav>
+    </header>
+
+    <form action="/treasurer_create_expenses" method="post">
+        <div class="container">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <p class="budget"><strong>Budget source:</strong></p>
+                <select id="budgetSource" name="budgetSource" required>
+                    <option value="">Select a budget source</option>
+                        <option value=""></option>
+                </select>
+            </div>
+
+            <div class="header-section">
+         
+                <span class="date-filters">
+                    <p><strong>From:</strong>
+                        <input type="date" id="fromDatePicker" name="fromDate" required />
+                    </p>
+                    <p><strong>To:</strong>
+                        <input type="date" id="toDatePicker" name="toDate" required />
+                    </p>
+                </span>
+    
+                <div style="margin-left: 50%;">
+                    <strong><a href="/Treasurer_create_expenses">Back</a></strong>
+                </div>
+            </div>
+    
+            <div class="scrollable-table-container">
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>Qty</th>
+                            <th>Label</th>
+                            <th>Price</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (expenses && expenses.length > 0) { %>
+                            <% expenses.forEach(expense => { %>
+                                <tr>
+                                    <td><input type="text" class="input-field" placeholder="Enter description" name="description" value="<%= expense.description %>" readonly /></td>
+                                    <td><input type="number" class="input-field qty" placeholder="Enter quantity" name="quantity" value="<%= expense.qty %>" readonly /></td>
+                                    <td><input type="text" class="input-field" placeholder="Enter label" name="label" value="<%= expense.label %>" readonly /></td>
+                                    <td><input type="number" class="input-field price" placeholder="Enter price" name="price" value="<%= expense.price %>" readonly /></td>
+                                    <td><input type="number" class="input-field total" placeholder="Total" readonly value="<%= expense.qty * expense.price %>" /></td>
+                                    <input type="hidden" name="expenseDate" value="<%= expense.date %>" />
+                                </tr>
+                            <% }); %>
+                        <% } else { %>
+                            <tr><td colspan="5">No expenses found for this date.</td></tr>
+                        <% } %>
+                    </tbody>
+    
+                    <tfoot>
+                        <tr>
+                            <td>Total</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td><input type="number" id="grandTotal" name="grandTotal" value="0" readonly /></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+    
+            <div style="margin-top: 20px;">
+                <button type="submit" id="saveButton">Save</button>
+            </div>
+        </div>
+    </form>
+    
+    <script>
+        document.getElementById("fromDatePicker").addEventListener("change", function() {
+            filterRows();
+            calculateGrandTotal();
+        });
+    
+        document.getElementById("toDatePicker").addEventListener("change", function() {
+            filterRows();
+            calculateGrandTotal();
+        });
+    
+        function filterRows() {
+            var selectedFromDate = document.getElementById("fromDatePicker").value;
+            var selectedToDate = document.getElementById("toDatePicker").value;
+            var fromDate = new Date(selectedFromDate);
+            var toDate = new Date(selectedToDate);
+    
+            var rows = document.querySelectorAll("#dataTable tbody tr");
+    
+            rows.forEach(function(row) {
+                var expenseDate = row.querySelector("input[name='expenseDate']").value;
+                var expenseDateObj = new Date(expenseDate);
+    
+                if (selectedFromDate && selectedToDate) {
+                    if (expenseDateObj >= fromDate && expenseDateObj <= toDate) {
+                        row.style.display = ""; 
+                    } else {
+                        row.style.display = "none";  
+                    }
+                }
+                else if (selectedFromDate && !selectedToDate) {
+                    if (selectedFromDate === expenseDate) {
+                        row.style.display = ""; 
+                    } else {
+                        row.style.display = "none"; 
+                    }
+                } else {
+                    row.style.display = ""; 
+                }
+            });
+        }
+    
+        function calculateGrandTotal() {
+            var rows = document.querySelectorAll("#dataTable tbody tr");
+            var grandTotal = 0;
+    
+            rows.forEach(function(row) {
+                if (row.style.display !== "none") { 
+                    var qty = parseFloat(row.querySelector(".qty").value) || 0;
+                    var price = parseFloat(row.querySelector(".price").value) || 0;
+                    var total = qty * price;
+                    row.querySelector(".total").value = total.toFixed(2);
+                    grandTotal += total;
+                }
+            });
+    
+            document.getElementById("grandTotal").value = grandTotal.toFixed(2);
+        }
+    
+        calculateGrandTotal();
+    </script>
+    
+    
+    <script>
+        document.getElementById("fromDatePicker").addEventListener("change", function() {
+            filterRows();
+            calculateGrandTotal();
+        });
+    
+        document.getElementById("toDatePicker").addEventListener("change", function() {
+            filterRows();
+            calculateGrandTotal();
+        });
+        function filterRows() {
+            var selectedFromDate = document.getElementById("fromDatePicker").value;
+            var selectedToDate = document.getElementById("toDatePicker").value;
+            var fromDate = new Date(selectedFromDate);
+            var toDate = new Date(selectedToDate);
+    
+            var rows = document.querySelectorAll("#dataTable tbody tr");
+    
+            rows.forEach(function(row) {
+                var expenseDate = row.querySelector("input[name='expenseDate']").value;
+                var expenseDateObj = new Date(expenseDate);
+    
+                if (selectedFromDate && selectedToDate) {
+                    if (expenseDateObj >= fromDate && expenseDateObj <= toDate) {
+                        row.style.display = ""; 
+                    } else {
+                        row.style.display = "none";  
+                    }
+                }
+                else if (selectedFromDate && !selectedToDate) {
+                    if (selectedFromDate === expenseDate) {
+                        row.style.display = ""; 
+                    } else {
+                        row.style.display = "none"; 
+                    }
+                } else {
+                    row.style.display = ""; 
+                }
+            });
+        }
+    
+
+        function calculateGrandTotal() {
+            var rows = document.querySelectorAll("#dataTable tbody tr");
+            var grandTotal = 0;
+    
+            rows.forEach(function(row) {
+                if (row.style.display !== "none") { 
+                    var qty = parseFloat(row.querySelector(".qty").value) || 0;
+                    var price = parseFloat(row.querySelector(".price").value) || 0;
+                    var total = qty * price;
+                    row.querySelector(".total").value = total.toFixed(2);
+                    grandTotal += total;
+                }
+            });
+    
+            document.getElementById("grandTotal").value = grandTotal.toFixed(2);
+        }
+    
+        calculateGrandTotal();
+    </script>
+    
+    
+
+    
+    
+    
+    
+
+    
+    <script src="/TREASURER_JS/Treasurer_BSIT_3A_remittance.js"> </script>
+</body>
+</html>
+      

@@ -42,7 +42,7 @@
             <a href="#">BSIT-2A</a>
             <a href="#">BSIT-2B</a>
             <a href="treasurer_3A_verify_remittance">BSIT-3A</a>
-            <a href="treasurer_3A_verify_remittance">BSIT-3B</a>
+            <a href="treasurer_3B_verify_remittance">BSIT-3B</a>
             <a href="#">BSIT-4A</a>
             <a href="#">BSIT-4B</a>
         </div>
@@ -53,7 +53,7 @@
         <span class="arrow"></span>
         <div class="dropdown-content" id="reportDropdown">
           <a href="#">MONTHLY REPORT</a>
-          <a href="#">EXPENSES</a>
+          <a href="/treasurer_create_expenses">EXPENSES</a>
         </div>
       </div>
       
@@ -65,7 +65,7 @@
     </a>
     <span class="arrow" onclick="toggleDropdown('userDropdown')"></span>
     <div class="dropdown-content" id="userDropdown">
-      <a href="#">MANAGE ACCOUNT</a>
+      <a href="Treasurer_archieve">MANAGE ACCOUNT</a>
       <a href="logout">LOGOUT</a>
     </div>
   </div>
@@ -75,26 +75,29 @@
 
     <div class="padding">
         <div class="welcome">
-          <div class="welcome">WELCOME <%= treasurerName %></div>
+            <div class="welcome">WELCOME <%= treasurerName %></div>
         </div>
+    
+        <div class="card-container">
+            <div class="card" onclick="window.location.href='/Treasurer_funds';">
+                <h2>FUNDS</h2>
+                <h1 class="funds">₱ <%= totalFunds.toLocaleString('en-US') %></h1>
         
-        
-        <div class="card-container"  onclick="window.location.href='/Treasurer_funds';">
-                <div class="card">
-                    <h2>FUNDS</h2>
-                    <p class="funds">₱<%= totalFunds.toLocaleString('en-US', { minimumFractionDigits: 2 }) %></p>
+            </div>
+    
+            <div class="card" onclick="window.location.href='/Treasurer_receivable';">
+                <h2>RECEIVABLE</h2>
+                <h1>₱ <%= blockABalances %></h1> 
             </div>
             
-            <div class="card">
-                <h2>RECEIVABLE</h2>
-                <p>₱10,000.00</p>
-            </div>
-            <div class="card">
+    
+            <div class="card" onclick="window.location.href='/Treasurer_expenses';">
                 <h2>EXPENSES</h2>
-                <p>₱1,000.00</p>
+                <h1>₱ 0</h1>
             </div>
         </div>
     </div>
+    
 
     <script src="/TREASURER_JS/Treasurer_dashboard.js"></script>
 
